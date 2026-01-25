@@ -39,6 +39,14 @@ class Business(models.Model):
     def __str__(self):
         return self.name
 
+class Posts(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    business = models.ForeignKey(Business, on_delete=models.CASCADE)
+    description = models.TextField()
+    price = models.FloatField()
+    def __str__(self):
+        return f"Job Post by {self.user.username} - ${self.price}"
+        
 class Service(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="service")
     description = models.TextField(max_length=200)
