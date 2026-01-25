@@ -38,3 +38,12 @@ class Business(models.Model):
 
     def __str__(self):
         return self.name
+
+class Service(models.Model):
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="service")
+    description = models.TextField(max_length=200)
+    time = models.IntegerField()
+    price = models.IntegerField()
+
+    def __str__(self):
+        return self.name
