@@ -55,6 +55,26 @@ class Service(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Review(models.Model):
+    class Rating(models.IntegerChoices):
+        ONE = 1, "1 Stars"
+        TWO = 2, "2 Stars"
+        THREE = 3, "3 Stars"
+        FOUR = 4, "4 Stars"
+        FIVE = 5, "5 Stars"
+    
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="reviews")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    rating = models.IntegerField(
+        choices=Rating.choices,
+        default=Rating.FIVE
+    )
+
+    def __str__(self):
+        return f"Review by {self.user.username} - {self.rating} stars"
+    
 class Messages(models.Model):
     sender = models.ForeignKey(User, related_name="sent_messages", on_delete=models.CASCADE)
     receiver = models.ForeignKey(User, related_name="received_messages", on_delete=models.CASCADE)
