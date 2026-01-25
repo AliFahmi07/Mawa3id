@@ -8,17 +8,27 @@ class Profile(models.Model):
         CLIENT = "client", "Client"
         BUSINESS_OWNER = "business_owner", "Business Owner"
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    image = image = models.ImageField(upload_to="main_app/static/uploads"
-        default=""
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="profile",
         )
+
+    image = image = models.ImageField(
+        upload_to="main_app/static/uploads",
+        default="",
+        )
+
     role = models.CharField(
+        max_length=50,
         choices=Role.choices,
         default=Role.CLIENT,
         )
 
     def __str__(self):
         return f"{self.user} ({self.role})"
+
+#===========================================================================================================
 
 class Business(models.Model):
     class Category(models.TextChoices):
@@ -28,29 +38,63 @@ class Business(models.Model):
         SALON = "salon", "Salon"
         CLINIC = "clinic", "Clinic"
         OTHER = "other", "Other"
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="business")
+
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="businesses",
+        )
+
     name = models.CharField(max_length=100)
+
     description = models.TextField(max_length=500)
+
     category = models.CharField(
-        choices=Category.choices
-        default=Category.OTHER
+        max_length=30,
+        choices=Category.choices,
+        default=Category.OTHER,
         )
 
     def __str__(self):
         return self.name
 
+#===========================================================================================================
+
 class Posts(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    business = models.ForeignKey(Business, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="posts",
+        )
+
+    business = models.ForeignKey(
+        Business,
+        on_delete=models.CASCADE,
+        related_name="posts",
+        )
+
     description = models.TextField()
+
     price = models.FloatField()
+
     def __str__(self):
         return f"Job Post by {self.user.username} - ${self.price}"
-        
+
+#===========================================================================================================
+
 class Service(models.Model):
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="service")
+    business = models.ForeignKey(
+        Business,
+        on_delete=models.CASCADE,
+        related_name="services",
+        )
+
+    name = models.CharField(max_length=50)
+
     description = models.TextField(max_length=200)
+
     time = models.IntegerField()
+
     price = models.IntegerField()
 
     def __str__(self):
@@ -75,11 +119,28 @@ class Review(models.Model):
     def __str__(self):
         return f"Review by {self.user.username} - {self.rating} stars"
     
+        return self.business
+
+#===========================================================================================================
+
 class Messages(models.Model):
-    sender = models.ForeignKey(User, related_name="sent_messages", on_delete=models.CASCADE)
-    receiver = models.ForeignKey(User, related_name="received_messages", on_delete=models.CASCADE)
+    sender = models.ForeignKey(
+        User,
+        related_name="sent_messages",
+        on_delete=models.CASCADE,
+        )
+
+    receiver = models.ForeignKey(
+        User,
+        related_name="received_messages",
+        on_delete=models.CASCADE,
+        )
+
     content = models.TextField()
+
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.sender} -> {self.receiver}: {self.content[:20]}"
+
+#===========================================================================================================
