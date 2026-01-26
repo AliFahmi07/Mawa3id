@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from .models import Business, Profile
 
 # Create your views here.
 
@@ -22,3 +24,8 @@ def signup(request):
     form = UserCreationForm
     context = {'form': form, 'error_message': error_message}
     return render(request, 'registration/signup.html', context)
+
+
+class BusinessCreate(CreateView):
+    model = Business
+    fields = ['name', 'description', 'category']
