@@ -14,7 +14,7 @@ class Profile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
 
-    image = models.ImageField(upload_to="profiles/", null=True, blank=True)
+    image = models.ImageField(upload_to="main_app/static/uploads", default="")
 
     role = models.CharField(max_length=20, choices=Role.choices)
 
