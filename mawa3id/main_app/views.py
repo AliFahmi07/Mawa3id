@@ -8,7 +8,7 @@ from .models import Business, Profile
 # Create your views here.
 
 def home(request):
-    return HttpResponse("Hello")
+    return render(request, 'home.html')
 
 
 def signup(request):
