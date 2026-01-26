@@ -18,7 +18,7 @@ def signup(request):
         if form.is_valid():
             user=form.save()
             login(request,user)
-            return redirect('index')
+            return redirect('home')
         else:
             error_message = 'Invalid signup - try again'
     form = UserCreationForm
@@ -29,3 +29,8 @@ def signup(request):
 class BusinessCreate(CreateView):
     model = Business
     fields = ['name', 'description', 'category']
+    success_url = '/'
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
