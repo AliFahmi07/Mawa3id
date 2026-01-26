@@ -138,7 +138,7 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name="reviews",
         )
-    
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -163,10 +163,28 @@ class Appointment(models.Model):
         CANCELLED = "cancelled", "Cancelled"
         COMPLETED = "completed", "Completed"
 
-    business = models.ForeignKey(Business,on_delete=models.CASCADE,related_name="appointments")
-    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="appointments")
-    service = models.ForeignKey(Service,on_delete=models.CASCADE,related_name="appointments")
-    status = models.CharField(choices=Status.choices,default=Status.PENDING)
+    business = models.ForeignKey(
+        Business,
+        on_delete=models.CASCADE,
+        related_name="appointments",
+        )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="appointments",
+        )
+
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        related_name="appointments",
+        )
+
+    status = models.CharField(
+        choices=Status.choices,
+        default=Status.PENDING,
+        )
 
     def __str__(self):
         return f"{self.user} - {self.service.name} - {self.status}"
