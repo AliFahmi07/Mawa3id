@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="messages-container">
+    <h1>Messages</h1>
+    
+    {% if conversations %}
+        <div class="conversations-list">
+            {% for conv in conversations %}
+                <a href="{% url 'conversation' user_id=conv.contact.id %}" class="conversation-card">
+                    <div class="conversation-info">
+                        <div class="conversation-header">
+                            <span class="contact-name">{{ conv.contact.username }}</span>
+                            {% if conv.unread_count > 0 %}
+                                <span class="unread-badge">{{ conv.unread_count }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        {% if conv.latest_message %}
+                            <p class="last-message">
+                                {% if conv.latest_message.sender == request.user %}
+                                    <span class="you-label">You: </span>
+                                {% endif %}
+                                {{ conv.latest_message.content|truncatechars:50 }}
+                            </p>
+                            <span class="timestamp">{{ conv.latest_message.timestamp|timesince }} ago</span>
+                        {% endif %}
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No conversations yet.</p>
+            <p>Start a conversation by messaging a business from their profile page.</p>
+        </div>
+    {% endif %}
+</div>
+
+
+{% endblock content %}

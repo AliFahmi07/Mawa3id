@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="conversation-container">
+    <div class="conversation-header">
+        <a href="{% url 'inbox' %}" class="back-button">← Back</a>
+        <h2>{{ other_user.username }}</h2>
+    </div>
+    
+    <div class="messages-thread" id="messages-thread">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message-bubble {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                    <div class="message-content">{{ message.content }}</div>
+                    <div class="message-time">{{ message.timestamp|date:"M d, H:i" }}</div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-conversation">
+                <p>No messages yet. Start the conversation!</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <form class="message-form" action="{% url 'send_message' receiver_id=other_user.id %}" method="POST">
+        {% csrf_token %}
+        <div class="input-container">
+            <textarea 
+                name="content" 
+                placeholder="Type your message..." 
+                maxlength="1000"
+                rows="2"
+                required
+            ></textarea>
+            <button type="submit">Send</button>
+        </div>
+        <div class="char-count">
+            <span id="char-count">0</span>/1000
+        </div>
+    </form>
+</div>
+
+
+{% endblock content %}
