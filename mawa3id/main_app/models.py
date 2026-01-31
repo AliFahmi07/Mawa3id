@@ -169,12 +169,15 @@ class TimeSlot(models.Model):
         Service,
         on_delete=models.CASCADE,
         blank = True,
+        null = True,
         related_name="slots",
     )
 
     start = models.DateTimeField()
     duration = models.IntegerField()
     is_active = models. BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.business.name} | {self.start} - {self.duration}"
@@ -202,12 +205,14 @@ class Booking(models.Model):
         related_name="bookings"
     )
     status = models.CharField(
-        max_length=50,
+        max_length=20,
         choices=Status.choices,
         default=Status.PENDING,
     )
 
     notes = models.TextField(blank = True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.client.username} | {self.slot.business.name} | {self.slot.start}"

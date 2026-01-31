@@ -74,5 +74,3 @@ class BusinessDetail(DetailView):
 
 #===========================================================================================================
 #Appointments
-
-class AppointmentCreate()

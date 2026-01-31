@@ -5,4 +5,3 @@ from .models import Profile, Business
 
 admin.site.register(Profile)
 admin.site.register(Business)
-# admin.site.register()
