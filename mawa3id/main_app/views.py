@@ -9,6 +9,9 @@ from django.urls import reverse
 
 # Create your views here.
 
+#===========================================================================================================
+#Registration
+
 def home(request):
     return render(request, 'home.html')
 
@@ -27,9 +30,9 @@ def signup(request):
     context = {'form': form, 'error_message': error_message}
     return render(request, 'registration/signup.html', )
 
-
 #===========================================================================================================
 #Profile
+
 class ProfileCreate(CreateView):
     model = Profile
     fields = ["image", "role"]
@@ -52,6 +55,7 @@ class ProfileDetail(DetailView):
 
 #===========================================================================================================
 #Business
+
 class BusinessCreate(CreateView):
     model = Business
     fields = ['name', 'description', 'category']
@@ -67,3 +71,8 @@ class BusinessDetail(DetailView):
 
     def get_object(self):
         return Business.objects.get(owner = self.request.user)
+
+#===========================================================================================================
+#Appointments
+
+class AppointmentCreate()
