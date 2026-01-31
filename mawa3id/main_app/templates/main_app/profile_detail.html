@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Profile</h1>
+  <div >
+    <div>
+      <span>{{ User.name }}</span>
+      <div >
+        <a href="">Edit</a>
+        <a href="">Delete</a>
+      </div>
+      {% load static%}
+      <img src="{% static profile.image|cut:'main_app/static/' %}" alt="" />
+    </div>
+  </div>
+{% endblock content %}
+
+
