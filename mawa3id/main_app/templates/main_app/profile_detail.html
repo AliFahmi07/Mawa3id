@@ -5,14 +5,11 @@
   <div >
     <div>
       <span>{{ User.name }}</span>
-      <div >
-        <a href="">Edit</a>
-        <a href="">Delete</a>
+      <div>
+        <a href="{% url 'profile_update' %}">Edit</a>
       </div>
       {% load static%}
-      <img src="{% static profile.image|cut:'main_app/static/' %}" alt="" />
+      <img src="{% static profile.image|cut:'main_app/static/' %}" alt="no photo" />
     </div>
   </div>
 {% endblock content %}
-
-
