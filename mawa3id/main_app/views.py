@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import DetailView
-from .models import Business, Profile
+from .models import Business, Profile, Posts
 from django.urls import reverse
 
 # Create your views here.
@@ -26,6 +26,14 @@ def signup(request):
     form = UserCreationForm
     context = {'form': form, 'error_message': error_message}
     return render(request, 'registration/signup.html', )
+
+def posts_index(request):
+    posts = Posts.objects.filter(user=request.user)
+    return render(request, 'posts/index.html')
+
+def posts_detail(request, posts_id):
+    posts = Posts.objects.get(posts=posts_id)
+    return render(request, 'posts/detail.html', {'posts': posts})
 
 
 #===========================================================================================================
@@ -67,3 +75,22 @@ class BusinessDetail(DetailView):
 
     def get_object(self):
         return Business.objects.get(owner = self.request.user)
+
+#===========================================================================================================
+#Posts
+class PostCreate(CreateView):
+    model = Posts
+    fields = ['description']
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+    
+class PostUpdate(UpdateView):
+    model = Posts
+    fields = ['description']
+
+class PostDelete(DeleteView):
+    model = Posts
+    success_url = '/posts/'
+
