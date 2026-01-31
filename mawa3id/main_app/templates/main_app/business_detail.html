@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+{% if object %}
 <h1>Business</h1>
   <div >
     <div>
@@ -8,11 +10,16 @@
       <span>{{ business.category }}</span>
       <span>{{ business.description }}</span>
       <div >
-        <a href="">Edit</a>
-        <a href="">Delete</a>
+        <a href="{%url 'business_update' business.id %}">Edit</a>
       </div>
     </div>
   </div>
+{% else %}
+<a href="{%url 'business_create' %}">
+  crate business
+</a>
+{% endif %}
+
 {% endblock content %}
 
 

@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
  {% block content %}
+ {%if object%}
+<h1>update business</h1>
+{%else%}
 <h1>create business</h1>
+{% endif %}
 <form action="" method='post'>
   {% csrf_token %}
     <table>

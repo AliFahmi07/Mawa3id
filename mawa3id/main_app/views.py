@@ -6,6 +6,9 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import DetailView
 from .models import Business, Profile
 from django.urls import reverse
+from django.views import View
+from .forms import UserUpdateForm, ProfileUpdateForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 
@@ -45,11 +48,33 @@ class ProfileCreate(CreateView):
 
 class ProfileDetail(DetailView):
     model = Profile
-    template_name = 'main_app/profile_detail.html'
 
     def get_object(self):
         return Profile.objects.get(user=self.request.user)
 
+class ProfileUpdateView(View):
+    def get(self, request):
+        user_form = UserUpdateForm(instance=request.user)
+        profile_form = ProfileUpdateForm(instance=request.user.profile)
+
+        return render(request, "main_app/profile_update.html", {
+            "user_form": user_form,
+            "profile_form": profile_form
+        })
+
+    def post(self, request):
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            return redirect("/profile")  # change to your profile page
+
+        return render(request, "profile_update.html", {
+            "user_form": user_form,
+            "profile_form": profile_form
+        })
 #===========================================================================================================
 #Business
 class BusinessCreate(CreateView):
@@ -66,4 +91,9 @@ class BusinessDetail(DetailView):
     template_name = 'main_app/business_detail.html'
 
     def get_object(self):
-        return Business.objects.get(owner = self.request.user)
+        return Business.objects.filter(owner=self.request.user).first()
+
+class BusinessUpdate(UpdateView):
+    model = Business
+    fields = ['name', 'description', 'category']
+    success_url = 'business_detail'
