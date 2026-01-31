@@ -119,9 +119,15 @@ class Messages(models.Model):
         on_delete=models.CASCADE,
         )
 
-    content = models.TextField()
+    content = models.TextField(max_length=1000)
 
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['timestamp']
+        verbose_name_plural = 'Messages'
 
     def __str__(self):
         return f"{self.sender} -> {self.receiver}: {self.content[:20]}"
