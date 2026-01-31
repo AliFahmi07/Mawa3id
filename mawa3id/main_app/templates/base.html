@@ -11,6 +11,7 @@
   <body>
     <nav>
       {% if user.is_authenticated %}
+      <li><a href="{% url 'inbox' %}">Messages{% if total_unread %} ({{ total_unread }}){% endif %}</a></li>
       <li>
         <form method="post" action="{% url 'logout' %}">
           {% csrf_token %}
