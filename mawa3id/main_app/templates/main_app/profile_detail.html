@@ -4,13 +4,18 @@
 <h1>Profile</h1>
   <div >
     <div>
-      <span>{{ User.name }}</span>
+      <span>{{ profile.user.username }}</span>
       <div >
         <a href="">Edit</a>
         <a href="">Delete</a>
       </div>
       {% load static%}
       <img src="{% static profile.image|cut:'main_app/static/' %}" alt="" />
+      {% if user.is_authenticated and user != profile.user %}
+      <div class="contact-section">
+        <a href="{% url 'conversation' user_id=profile.user.id %}" class="message-button">Send Message</a>
+      </div>
+      {% endif %}
     </div>
   </div>
 {% endblock content %}

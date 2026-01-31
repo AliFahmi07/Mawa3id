@@ -11,6 +11,11 @@
         <a href="">Edit</a>
         <a href="">Delete</a>
       </div>
+      {% if user.is_authenticated and user != business.owner %}
+      <div class="contact-section">
+        <a href="{% url 'conversation' user_id=business.owner.id %}" class="message-button">Contact Business</a>
+      </div>
+      {% endif %}
     </div>
   </div>
 {% endblock content %}
