@@ -174,14 +174,15 @@ class TimeSlot(models.Model):
     )
 
     start = models.DateTimeField()
-    duration = models.IntegerField()
-    is_active = models. BooleanField(default=True)
+    duration = models.PositiveIntegerField()
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.business.name} | {self.start} - {self.duration}"
 
+    @property
     def is_booked(self):
         return hasattr(self, "booking")
 
@@ -213,6 +214,10 @@ class Booking(models.Model):
     notes = models.TextField(blank = True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # Google Calendar
+    google_event_id = models.CharField(max_length=255, blank=True, null=True)
+    google_calendar_id = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f"{self.client.username} | {self.slot.business.name} | {self.slot.start}"
