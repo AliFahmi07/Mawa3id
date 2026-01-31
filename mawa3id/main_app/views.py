@@ -7,6 +7,7 @@ from django.views.generic import DetailView
 from .models import Business, Profile
 from django.urls import reverse
 
+
 # Create your views here.
 
 def home(request):
@@ -49,6 +50,11 @@ class ProfileDetail(DetailView):
 
     def get_object(self):
         return Profile.objects.get(user=self.request.user)
+
+
+class ProfileUpdate (UpdateView):
+    model = Profile
+    fields = ['image', ]
 
 #===========================================================================================================
 #Business

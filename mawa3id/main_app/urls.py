@@ -7,6 +7,7 @@ urlpatterns = [
 
     path('profile/create/', views.ProfileCreate.as_view(), name= 'create_profile'),
     path('profile/<int:user_id>', views.ProfileDetail.as_view(), name= 'profile_detail'),
+    path('profile/<int:pk>/update/', views.ProfileUpdate.as_view(), name='profile_update'),#########
 
     path('business/create/', views.BusinessCreate.as_view(), name= 'create_business'),
     path('business/<int:user_id>', views.BusinessDetail.as_view(), name= 'business_detail'),
