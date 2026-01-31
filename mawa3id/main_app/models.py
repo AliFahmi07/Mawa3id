@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.contrib.auth.models import User
 from django.urls import reverse
 
 
@@ -126,21 +125,6 @@ class Messages(models.Model):
     def __str__(self):
         return f"{self.sender} -> {self.receiver}: {self.content[:20]}"
 
-class Appointments(models.Model):
-    class Status(models.TextChoices):
-        PENDING = "pending", "Pending"
-        CONFIRMED = "confirmed", "Confirmed"
-        CANCELLED = "cancelled", "Cancelled"
-        COMPLETED = "completed", "Completed"
-
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="appointments")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="appointments")
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="appointments")
-    status = models.CharField(choices=Status.choices,
-                              default=Status.PENDING)
-    
-    def __str__(self):
-        return f"{self.user} - {self.service.name} - {self.status}"
 #===========================================================================================================
 
 class Review(models.Model):
