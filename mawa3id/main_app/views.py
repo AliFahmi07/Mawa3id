@@ -65,7 +65,7 @@ def inbox(request):
     
     total_unread = Messages.objects.filter(receiver=user, is_read=False).count()
     
-    return render(request, 'main_app/inbox.html', {
+    return render(request, 'main_app/conversation_list.html', {
         'conversations': conversations,
         'total_unread': total_unread,
     })
