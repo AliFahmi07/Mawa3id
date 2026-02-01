@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{ business.name }} — Time Slots</h1>
+
+<p>
+  <a href="{% url 'timeslot_create' business_id=business.id %}">Add slot</a>
+</p>
+
+<ul>
+  {% for slot in slots %}
+    <li>
+      {{ slot.start }} — {{ slot.duration }} mins
+      {% if slot.service %} | {{ slot.service.name }}{% endif %}
+      {% if slot.is_active %} ✅ Active {% else %} ❌ Inactive {% endif %}
+      {% if slot.booking %} | 🔒 Booked {% else %} | 🟢 Available {% endif %}
+    </li>
+  {% empty %}
+    <li>No slots yet.</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}
+
+{% comment %}
+TEMPORARY HTML FOR TESTING
+{% endcomment %}

@@ -143,3 +143,18 @@ class TimeSlotCreate(CreateView):
 
     def get_success_url(self):
         return reverse('business_detail', kwargs={'business_id': self.object.business_id})
+
+
+class TimeSlotList(ListView):
+    model = TimeSlot
+    template_name = 'main_app/timeslot_list.html'
+    context_object_name = 'slots'
+
+    def get_queryset(self):
+        self.business = get_object_or_404(Business, pk=self.kwargs["business_id"])
+        return TimeSlot.objects.filter(business=self.business).select_related('service').order_by('start')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["business"] = self.business
+        return context

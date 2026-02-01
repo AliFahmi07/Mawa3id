@@ -13,5 +13,6 @@ urlpatterns = [
     path('business/<int:business_id>', views.BusinessDetail.as_view(), name= 'business_detail'),
     path('business/<int:business_id>/update', views.BusinessUpdate.as_view(), name= 'business_update'),
 
-    path('business/<int:business_id>/slot/create', views.TimeSlotCreate.as_view(), name= 'timeslot_create')
+    path('business/<int:business_id>/slot/create', views.TimeSlotCreate.as_view(), name= 'timeslot_create'),
+    path('business/<int:business_id>/slot', views.TimeSlotList.as_view(), name= 'timeslot_list'),
 ]
