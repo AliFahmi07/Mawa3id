@@ -6,10 +6,12 @@ urlpatterns = [
     path('accounts/signup/', views.signup, name='signup'),
 
     path('profile/create/', views.ProfileCreate.as_view(), name= 'create_profile'),
-    path('profile/<int:user_id>', views.ProfileDetail.as_view(), name= 'profile_detail'),
+    path('profile/', views.ProfileDetail.as_view(), name= 'profile_detail'),
+    path("profile/update/", views.ProfileUpdateView.as_view(), name="profile_update"),
 
-    path('business/create/', views.BusinessCreate.as_view(), name= 'create_business'),
-    path('business/<int:user_id>', views.BusinessDetail.as_view(), name= 'business_detail'),
+    path('business/create/', views.BusinessCreate.as_view(), name= 'business_create'),
+    path('business/<int:business_id>', views.BusinessDetail.as_view(), name= 'business_detail'),
+    path('business/<int:business_id>/update', views.BusinessUpdate.as_view(), name= 'business_update'),
 
-
+    path('business/<int:business_id>/slot/create', views.TimeSlotCreate.as_view(), name= 'timeslot_create')
 ]

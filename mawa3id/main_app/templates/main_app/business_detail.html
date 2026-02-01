@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
+      <li>
+      <a href="{% url 'timeslot_create' business_id=business.id %}">Add slot</a>
+      </li>
+
+{% if object %}
 <h1>Business</h1>
   <div >
     <div>
@@ -8,11 +13,14 @@
       <span>{{ business.category }}</span>
       <span>{{ business.description }}</span>
       <div >
-        <a href="">Edit</a>
-        <a href="">Delete</a>
+        <a href="{%url 'business_update' business.id %}">Edit</a>
       </div>
     </div>
   </div>
+{% else %}
+<a href="{%url 'business_create' %}">
+  create business
+</a>
+{% endif %}
+
 {% endblock content %}
-
-
