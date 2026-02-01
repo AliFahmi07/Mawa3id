@@ -11,6 +11,7 @@
   {% for slot in slots %}
     <li>
       {{ slot.start }} — {{ slot.duration }} mins
+      <a href="{% url 'timeslot_update' slot.pk %}">Edit</a>
       {% if slot.service %} | {{ slot.service.name }}{% endif %}
       {% if slot.is_active %} ✅ Active {% else %} ❌ Inactive {% endif %}
       {% if slot.booking %} | 🔒 Booked {% else %} | 🟢 Available {% endif %}

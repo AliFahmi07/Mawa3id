@@ -158,3 +158,11 @@ class TimeSlotList(ListView):
         context = super().get_context_data(**kwargs)
         context["business"] = self.business
         return context
+
+
+class TimeSlotUpdate(UpdateView):
+    model = TimeSlot
+    fields = ["service", "start", "duration", "is_active"]
+
+    def get_success_url(self):
+        return reverse("timeslot_list", kwargs={"business_id": self.object.business_id})
