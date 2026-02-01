@@ -11,5 +11,7 @@ urlpatterns = [
     path('business/create/', views.BusinessCreate.as_view(), name= 'create_business'),
     path('business/<int:user_id>', views.BusinessDetail.as_view(), name= 'business_detail'),
 
-
+    path('service/<int:service_id>/review/add/', views.add_review, name='add_review'),
+    path('review/<int:pk>/update/', views.ReviewUpdate.as_view(), name='review_update'),
+    path('review/<int:pk>/delete/', views.ReviewDelete.as_view(), name='review_delete'),
 ]
