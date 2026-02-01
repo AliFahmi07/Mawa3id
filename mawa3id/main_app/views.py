@@ -166,3 +166,11 @@ class TimeSlotUpdate(UpdateView):
 
     def get_success_url(self):
         return reverse("timeslot_list", kwargs={"business_id": self.object.business_id})
+
+
+class TimeSlotDelete(DeleteView):
+    model = TimeSlot
+
+    def get_success_url(self):
+        return reverse("timeslot_list", kwargs={"business_id": self.object.business_id})
+

@@ -16,4 +16,5 @@ urlpatterns = [
     path('business/<int:business_id>/slot/create', views.TimeSlotCreate.as_view(), name= 'timeslot_create'),
     path('business/<int:business_id>/slot', views.TimeSlotList.as_view(), name= 'timeslot_list'),
     path('slot/<int:pk>/update', views.TimeSlotUpdate.as_view(), name='timeslot_update'),
+    path('slot/<int:pk>/delete', views.TimeSlotDelete.as_view(), name='timeslot_delete'),
 ]
