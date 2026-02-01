@@ -3,9 +3,10 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import DetailView
-from .models import Business, Profile
+from django.views.generic import DetailView, ListView
+from .models import Business, Profile, TimeSlot, Booking
 from django.urls import reverse
+from .google_calendar import create_event_for_booking, update_event_for_booking, delete_event_for_booking
 
 # Create your views here.
 
@@ -75,4 +76,12 @@ class BusinessDetail(DetailView):
 #===========================================================================================================
 #Appointments
 
+class TimeSlotCreate(CreateView):
+    model = TimeSlot
+    fields = ['start','duration', 'service']
+
+    def form_valid(self, form):
+
+
+        return super().form_valid(form)
 

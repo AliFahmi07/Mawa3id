@@ -70,3 +70,45 @@ def create_event_for_booking(booking, calendar_id="primary"):
     booking.save(update_fields=["google_calendar_id", "google_event_id"])
 
     return created
+
+
+def update_event_for_booking(booking):
+    if not booking.google_event_id:
+        raise ValueError("Booking has no google_event_id; cannot update.")
+
+    owner = booking.slot.business.owner
+    creds = _get_google_credentials_for_user(owner)
+    service = build("calendar", "v3", credentials=creds)
+
+    calendar_id = booking.google_calendar_id or "primary"
+    body = _event_body_from_booking(booking)
+
+    updated = service.events().patch(
+        calendarId=calendar_id,
+        eventId=booking.google_event_id,
+        body=body,
+    ).execute()
+
+    return updated
+
+
+def delete_event_for_booking(booking):
+    if not booking.google_event_id:
+        return False
+
+    owner = booking.slot.business.owner
+    creds = _get_google_credentials_for_user(owner)
+    service = build("calendar", "v3", credentials=creds)
+
+    calendar_id = booking.google_calendar_id or "primary"
+
+    service.events().delete(
+        calendarId=calendar_id,
+        eventId=booking.google_event_id,
+    ).execute()
+
+    booking.google_event_id = None
+    booking.google_calendar_id = None
+    booking.save(update_fields=["google_event_id", "google_calendar_id"])
+
+    return True
