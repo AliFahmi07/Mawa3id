@@ -1,10 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import DetailView
-from .models import Business, Profile
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Business, Profile, Service, Review
 from django.urls import reverse
 
 # Create your views here.
@@ -66,4 +68,46 @@ class BusinessDetail(DetailView):
     template_name = 'main_app/business_detail.html'
 
     def get_object(self):
-        return Business.objects.get(owner = self.request.user)
+        business_id = self.kwargs.get('user_id')
+        return Business.objects.get(id=business_id)
+
+
+#===========================================================================================================
+#Review
+
+@login_required
+def add_review(request, service_id):
+    """Add a review to a service - prevents duplicates"""
+    service = get_object_or_404(Service, id=service_id)
+    
+    # Check if user already reviewed this service
+    if Review.objects.filter(service=service, user=request.user).exists():
+        return redirect('home')
+    
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        text = request.POST.get('text', '').strip()
+        
+        # Validate
+        if rating and text and len(text) <= 500:
+            Review.objects.create(
+                service=service,
+                user=request.user,
+                rating=int(rating),
+                text=text
+            )
+    
+    return redirect('home')
+
+
+class ReviewUpdate(LoginRequiredMixin, UpdateView):
+    model = Review
+    fields = ['rating', 'text']
+    template_name = 'main_app/review_form.html'
+    success_url = '/'
+
+
+class ReviewDelete(LoginRequiredMixin, DeleteView):
+    model = Review
+    template_name = 'main_app/review_confirm_delete.html'
+    success_url = '/'
