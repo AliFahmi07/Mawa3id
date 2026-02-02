@@ -8,30 +8,37 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Business, Profile, Service, Review
 from django.urls import reverse
+from django.views import View
+from .forms import UserUpdateForm, ProfileUpdateForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 
+
 def home(request):
-    return render(request, 'home.html')
+    return render(request, "home.html")
 
 
 def signup(request):
-    error_message=''
-    if request.method =='POST':
+    error_message = ""
+    if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            user=form.save()
-            login(request,user)
-            return redirect('/profile/create')
+            user = form.save()
+            login(request, user)
+            return redirect("/profile/create")
         else:
-            error_message = 'Invalid signup - try again'
+            error_message = "Invalid signup - try again"
     form = UserCreationForm
-    context = {'form': form, 'error_message': error_message}
-    return render(request, 'registration/signup.html', )
+    context = {"form": form, "error_message": error_message}
+    return render(
+        request,
+        "registration/signup.html",
+    )
 
 
-#===========================================================================================================
-#Profile
+# ===========================================================================================================
+# Profile
 class ProfileCreate(CreateView):
     model = Profile
     fields = ["image", "role"]
@@ -45,31 +52,70 @@ class ProfileCreate(CreateView):
             return reverse("create_business")
         return reverse("home")
 
+
 class ProfileDetail(DetailView):
     model = Profile
-    template_name = 'main_app/profile_detail.html'
 
     def get_object(self):
         return Profile.objects.get(user=self.request.user)
 
-#===========================================================================================================
-#Business
+
+class ProfileUpdateView(View):
+    def get(self, request):
+        user_form = UserUpdateForm(instance=request.user)
+        profile_form = ProfileUpdateForm(instance=request.user.profile)
+
+        return render(
+            request,
+            "main_app/profile_update.html",
+            {"user_form": user_form, "profile_form": profile_form},
+        )
+
+    def post(self, request):
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        profile_form = ProfileUpdateForm(
+            request.POST, request.FILES, instance=request.user.profile
+        )
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            return redirect("/profile")  # change to your profile page
+
+        return render(
+            request,
+            "profile_update.html",
+            {"user_form": user_form, "profile_form": profile_form},
+        )
+
+
+# ===========================================================================================================
+# Business
 class BusinessCreate(CreateView):
     model = Business
-    fields = ['name', 'description', 'category']
-    success_url = '/'
+    fields = ["name", "description", "category"]
+    success_url = "/"
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
         return super().form_valid(form)
 
+
 class BusinessDetail(DetailView):
     model = Business
-    template_name = 'main_app/business_detail.html'
+    template_name = "main_app/business_detail.html"
 
     def get_object(self):
-        business_id = self.kwargs.get('user_id')
+        business_id = self.kwargs.get('pk')
         return Business.objects.get(id=business_id)
+
+
+class BusinessUpdate(UpdateView):
+    model = Business
+    fields = ["name", "description", "category"]
+
+    def get_success_url(self):
+        return reverse("business_detail", kwargs={"pk": self.object.pk})
 
 
 #===========================================================================================================

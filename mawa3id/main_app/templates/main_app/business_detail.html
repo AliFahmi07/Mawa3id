@@ -1,16 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+{% if object %}
 <h1>Business</h1>
   <div>
     <div>
       <span>{{ business.name }}</span>
       <span>{{ business.category }}</span>
       <span>{{ business.description }}</span>
+      {% if user == business.owner %}
       <div>
-        <a href="">Edit</a>
-        <a href="">Delete</a>
+        <a href="{% url 'business_update' business.id %}">Edit</a>
       </div>
+      {% endif %}
     </div>
   </div>
 
@@ -83,7 +86,13 @@
 {% endfor %}
 
 {% if not business.services.count %}
-<p>No services available yet  </p>
+<p>No services available yet</p>
+{% endif %}
+
+{% else %}
+<a href="{% url 'business_create' %}">
+  Create business
+</a>
 {% endif %}
 
 {% endblock content %}
