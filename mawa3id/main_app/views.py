@@ -182,6 +182,9 @@ class ServiceUpdate(UpdateView):
     
 
 
+class ServiceDelete(DeleteView):
+    model = Service
+    success_url = "/business/show"
 
 #===========================================================================================================
 #Review
