@@ -2,7 +2,7 @@
 
 {% block content %}
 
-{% if object %}
+{% if service %}
 <h1>Service Detail</h1>
   <div>
     <div>
@@ -10,14 +10,14 @@
       <span>{{ service.description }}</span>
       <span>{{ service.price }}</span>
       <span>{{ service.time }}</span>
-      <div >
-        {% comment %} <a href="{%url 'business_update' business.id %}">Edit</a> {% endcomment %}
+      <div>
+        <a href="{% url 'service_update' service.id %}">Edit</a>
       </div>
     </div>
   </div>
 {% else %}
-<a href="{%url 'business_create' business.id %}">
-  crate service
+<a href="{% url 'service_create' %}">
+  Create service
 </a>
 {% endif %}
 

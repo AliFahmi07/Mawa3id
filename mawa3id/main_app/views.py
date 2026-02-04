@@ -3,7 +3,7 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import DetailView
+from django.views.generic import DetailView,ListView
 from .models import Business, Profile, Posts, Service
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -171,9 +171,16 @@ class ServiceDetail(DetailView):
     template_name = "main_app/service_detail.html"
 
     def get_object(self):
-        business_id = Business.objects.get(owner = self.request.user).id
-        return Service.objects.get(id=self.kwargs["service_id"], business = business_id)
-        return reverse("business_detail", kwargs={"pk": self.object.pk})
+        return Service.objects.get(id=self.kwargs["service_id"])    
+class ServiceUpdate(UpdateView):
+    model = Service
+    fields = ["name", "description", "time", "price"]
+    template_name = 'main_app/service_form.html'
+    
+    def get_success_url(self):
+        return reverse("service_detail", kwargs={'service_id': self.object.id})
+    
+
 
 
 #===========================================================================================================
