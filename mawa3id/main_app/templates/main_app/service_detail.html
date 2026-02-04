@@ -13,6 +13,9 @@
       <div >
         {% comment %} <a href="{%url 'business_update' business.id %}">Edit</a> {% endcomment %}
       </div>
+      <div >
+        <a href="{%url 'business_delete' business.id %}">Delete</a>
+      </div>
     </div>
   </div>
 {% else %}
