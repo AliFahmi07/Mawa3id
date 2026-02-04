@@ -10,10 +10,10 @@ urlpatterns = [
     path("profile/update/", views.ProfileUpdateView.as_view(), name="profile_update"),
 
     path('business/create/', views.BusinessCreate.as_view(), name= 'business_create'),
-    path('business/<int:pk>', views.BusinessDetail.as_view(), name= 'business_detail'),
+    path('business/show', views.BusinessDetail.as_view(), name= 'business_detail'),
     path('business/<int:pk>/update', views.BusinessUpdate.as_view(), name= 'business_update'),
 
-    path('business/<int:pk>/service/create/', views.ServiceCreate.as_view(), name= 'service_create'),
-    path('business/<int:pk>/service/<int:service_id>', views.BusinessDetail.as_view(), name= 'service_detail'),
+    path('business/service/create/', views.ServiceCreate.as_view(), name= 'service_create'),
+    path('business/service/<int:service_id>', views.ServiceDetail.as_view(), name= 'service_detail'),
 
 ]

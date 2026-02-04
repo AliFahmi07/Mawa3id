@@ -3,7 +3,7 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 from .models import Business, Profile, Service
 from django.urls import reverse
 from django.views import View
@@ -111,28 +111,36 @@ class BusinessUpdate(UpdateView):
     model = Business
     fields = ["name", "description", "category"]
 
-    def get_success_url(self):
-        return reverse("business_detail", kwargs={"pk": self.object.pk})
+    def get_queryset(self): # to update the user's business only
+        return Business.objects.filter(owner=self.request.user)
 
+    def get_success_url(self):
+        return reverse("business_detail")
+
+
+class BusinessList(ListView):
+    model = Business
+    template_name = "main_app/businesses"
 
 # ===========================================================================================================
 # Service
 
 
+
 class ServiceCreate(CreateView):
     model = Service
+    success_url = "/business/show"
     fields = ["name", "description", "time", "price"]
-
-    def form_valid(self, form):  # to add a business related to service
-        print("PK FROM URL:", self.kwargs["pk"])
-        business = Business.objects.get(id=self.kwargs["pk"])
-        form.instance.business = business
+    def form_valid(self, form):
+        form.instance.business_id = Business.objects.get(owner = self.request.user).id
         return super().form_valid(form)
 
 
-class ServiceDetail(DeleteView):
+
+class ServiceDetail(DetailView):
     model = Service
     template_name = "main_app/service_detail.html"
 
     def get_object(self):
-        return Service.objects.first(id=self.request.service_id)
+        business_id = Business.objects.get(owner = self.request.user).id
+        return Service.objects.get(id=self.kwargs["service_id"], business = business_id)
