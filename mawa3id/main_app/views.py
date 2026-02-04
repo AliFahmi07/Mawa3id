@@ -3,7 +3,7 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 from .models import Business, Profile, Posts, Service
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -175,6 +175,9 @@ class ServiceDetail(DetailView):
         return Service.objects.get(id=self.kwargs["service_id"], business = business_id)
         return reverse("business_detail", kwargs={"pk": self.object.pk})
 
+class ServiceDelete(DeleteView):
+    model = Service
+    success_url = "/business/show"
 
 #===========================================================================================================
 #Review
