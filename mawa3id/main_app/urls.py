@@ -15,6 +15,7 @@ urlpatterns = [
 
     path('business/service/create/', views.ServiceCreate.as_view(), name= 'service_create'),
     path('business/service/<int:service_id>', views.ServiceDetail.as_view(), name= 'service_detail'),
+    path('business/service/<int:pk>/update/', views.ServiceUpdate.as_view(), name= 'service_update'),
 
     # POSTS
     path('posts/', views.posts_index, name='posts_index'),
