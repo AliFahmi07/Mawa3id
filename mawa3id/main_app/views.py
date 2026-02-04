@@ -3,38 +3,51 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 from .models import Business, Profile, Posts, Service
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Business, Profile, Service, Review
 from django.urls import reverse
 from django.views import View
-from .forms import UserUpdateForm, ProfileUpdateForm
+from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 
 
 def home(request):
-    return render(request, "home.html")
-
+    context = {'business' :  False}
+    if request.user.is_authenticated:
+        user_profile = Profile.objects.get(user = request.user)
+        context = {'business' : True if user_profile.role == "business_owner" else False}
+        print(context)
+        
+    return render(request, "home.html", context)
 
 def signup(request):
     error_message = ""
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
+        user_form = UserCreationForm(request.POST)
+        profile_form = ProfileCreateForm(request.POST, request.FILES)
+        if user_form.is_valid():
+            user = user_form.save(commit=False)
+            profile = profile_form.save(commit=False)
+            user.save()
+            profile.user = user
+            profile.save()
             login(request, user)
-            return redirect("/profile/create")
+            return redirect("/profile")
         else:
             error_message = "Invalid signup - try again"
-    form = UserCreationForm
-    context = {"form": form, "error_message": error_message}
+
+    user_form = UserCreationForm
+    profile_form = ProfileCreateForm
+
+    context = {"user_form": user_form, "profile_form": profile_form ,"error_message": error_message}
     return render(
         request,
-        "registration/signup.html",
+        "registration/signup.html", context
     )
 
 def posts_index(request):
@@ -122,6 +135,7 @@ class BusinessDetail(DetailView):
 class PostCreate(CreateView):
     model = Posts
     fields = ['description']
+    template_name = 'posts/posts_form.html'
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -134,9 +148,6 @@ class PostUpdate(UpdateView):
 class PostDelete(DeleteView):
     model = Posts
     success_url = '/posts/'
-
-    business_id = self.kwargs.get('pk')
-    return Business.objects.get(id=business_id)
 
 
 class BusinessUpdate(UpdateView):
@@ -157,8 +168,6 @@ class BusinessList(ListView):
 # ===========================================================================================================
 # Service
 
-
-
 class ServiceCreate(CreateView):
     model = Service
     success_url = "/business/show"
@@ -176,7 +185,6 @@ class ServiceDetail(DetailView):
     def get_object(self):
         business_id = Business.objects.get(owner = self.request.user).id
         return Service.objects.get(id=self.kwargs["service_id"], business = business_id)
-        return reverse("business_detail", kwargs={"pk": self.object.pk})
 
 
 #===========================================================================================================
@@ -218,3 +226,7 @@ class ReviewDelete(LoginRequiredMixin, DeleteView):
     model = Review
     template_name = 'main_app/review_confirm_delete.html'
     success_url = '/'
+
+
+
+

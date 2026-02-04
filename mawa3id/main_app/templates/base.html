@@ -19,24 +19,27 @@
         </form>
       </li>
 
+
+      <li>
+        <a href="{%url 'home' %}">
+          Home
+        </a>
+      </li>
+
+
       <li>
         <a href="{%url 'profile_detail'%}">
           My Profile
         </a>
       </li>
 
-      <li>
-        <a href="{%url 'home'%}">
-          Home
-        </a>
-      </li>
-
+{%if business %}
       <li>
         <a href="{%url 'business_detail' %}">
           Business
         </a>
       </li>
-
+{% endif %}
 
 
       {% else %}
