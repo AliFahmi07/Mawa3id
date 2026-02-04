@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import DetailView
-from .models import Business, Profile
+from .models import Business, Profile, Service
 from django.urls import reverse
 from django.views import View
 from .forms import UserUpdateForm, ProfileUpdateForm
@@ -113,3 +113,26 @@ class BusinessUpdate(UpdateView):
 
     def get_success_url(self):
         return reverse("business_detail", kwargs={"pk": self.object.pk})
+
+
+# ===========================================================================================================
+# Service
+
+
+class ServiceCreate(CreateView):
+    model = Service
+    fields = ["name", "description", "time", "price"]
+
+    def form_valid(self, form):  # to add a business related to service
+        print("PK FROM URL:", self.kwargs["pk"])
+        business = Business.objects.get(id=self.kwargs["pk"])
+        form.instance.business = business
+        return super().form_valid(form)
+
+
+class ServiceDetail(DeleteView):
+    model = Service
+    template_name = "main_app/service_detail.html"
+
+    def get_object(self):
+        return Service.objects.first(id=self.request.service_id)
