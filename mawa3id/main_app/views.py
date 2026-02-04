@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import DetailView
-from .models import Business, Profile, Posts
+from .models import Business, Profile, Posts, Service
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Business, Profile, Service, Review
@@ -126,7 +126,7 @@ class PostCreate(CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
-    
+
 class PostUpdate(UpdateView):
     model = Posts
     fields = ['description']
@@ -135,15 +135,44 @@ class PostDelete(DeleteView):
     model = Posts
     success_url = '/posts/'
 
-    business_id = self.kwargs.get('pk')
-    return Business.objects.get(id=business_id)
-
 
 class BusinessUpdate(UpdateView):
     model = Business
     fields = ["name", "description", "category"]
 
+    def get_queryset(self): # to update the user's business only
+        return Business.objects.filter(owner=self.request.user)
+
     def get_success_url(self):
+        return reverse("business_detail")
+
+
+class BusinessList(ListView):
+    model = Business
+    template_name = "main_app/businesses"
+
+# ===========================================================================================================
+# Service
+
+
+
+class ServiceCreate(CreateView):
+    model = Service
+    success_url = "/business/show"
+    fields = ["name", "description", "time", "price"]
+    def form_valid(self, form):
+        form.instance.business_id = Business.objects.get(owner = self.request.user).id
+        return super().form_valid(form)
+
+
+
+class ServiceDetail(DetailView):
+    model = Service
+    template_name = "main_app/service_detail.html"
+
+    def get_object(self):
+        business_id = Business.objects.get(owner = self.request.user).id
+        return Service.objects.get(id=self.kwargs["service_id"], business = business_id)
         return reverse("business_detail", kwargs={"pk": self.object.pk})
 
 
@@ -154,15 +183,15 @@ class BusinessUpdate(UpdateView):
 def add_review(request, service_id):
     """Add a review to a service - prevents duplicates"""
     service = get_object_or_404(Service, id=service_id)
-    
+
     # Check if user already reviewed this service
     if Review.objects.filter(service=service, user=request.user).exists():
         return redirect('home')
-    
+
     if request.method == 'POST':
         rating = request.POST.get('rating')
         text = request.POST.get('text', '').strip()
-        
+
         # Validate
         if rating and text and len(text) <= 500:
             Review.objects.create(
@@ -171,7 +200,7 @@ def add_review(request, service_id):
                 rating=int(rating),
                 text=text
             )
-    
+
     return redirect('home')
 
 
