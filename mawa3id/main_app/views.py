@@ -183,9 +183,20 @@ class ServiceDetail(DetailView):
     template_name = "main_app/service_detail.html"
 
     def get_object(self):
-        business_id = Business.objects.get(owner = self.request.user).id
-        return Service.objects.get(id=self.kwargs["service_id"], business = business_id)
+        return Service.objects.get(id=self.kwargs["service_id"])    
+class ServiceUpdate(UpdateView):
+    model = Service
+    fields = ["name", "description", "time", "price"]
+    template_name = 'main_app/service_form.html'
+    
+    def get_success_url(self):
+        return reverse("service_detail", kwargs={'service_id': self.object.id})
+    
 
+
+class ServiceDelete(DeleteView):
+    model = Service
+    success_url = "/business/show"
 
 #===========================================================================================================
 #Review
