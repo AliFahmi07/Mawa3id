@@ -13,6 +13,13 @@ urlpatterns = [
     path('business/<int:pk>', views.BusinessDetail.as_view(), name= 'business_detail'),
     path('business/<int:pk>/update', views.BusinessUpdate.as_view(), name= 'business_update'),
 
+    # POSTS
+    path('posts/', views.posts_index, name='posts_index'),
+    path('posts/<int:posts_id>/', views.posts_detail, name='posts_detail'),
+    path('posts/create/', views.PostCreate.as_view(), name='posts_create'),
+    path('posts/<int:pk>/update/', views.PostUpdate.as_view(), name='posts_update'),
+    path('posts/<int:pk>/delete/', views.PostDelete.as_view(), name='posts_delete'),
+
 
     path('service/<int:service_id>/review/add/', views.add_review, name='add_review'),
     path('review/<int:pk>/update/', views.ReviewUpdate.as_view(), name='review_update'),
