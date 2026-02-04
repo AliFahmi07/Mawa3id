@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% for post in posts %}
+  <div class="card">
+    <a href="{% url 'detail' posts.id %}">
+    <div class="card-content">
+      <span class="card-title">{{ posts.user }}</span>
+      <p>Description: {{ posts.description }}</p>
+    </div>
+    </a>
+  </div>
+
+  <a href="{% url 'poats_create' %}">Add new Post</a>
+
+{% endfor %}
+
+{% endblock %}
