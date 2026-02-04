@@ -135,9 +135,6 @@ class PostDelete(DeleteView):
     model = Posts
     success_url = '/posts/'
 
-    business_id = self.kwargs.get('pk')
-    return Business.objects.get(id=business_id)
-
 
 class BusinessUpdate(UpdateView):
     model = Business
