@@ -263,6 +263,41 @@ class BookingCreate(CreateView):
 class BookingUpdate(UpdateView):
     model = Booking
     fields = [""]
+    template_name="main_app/booking_form.html"
+
+    def get_queryset(self):
+        return Booking.objects.filter(client=self.request.user)
+
+    def form_valid(self, form):
+
+        response = super().form_valid(form)
+
+        try:
+            create_event_for_booking(self.object)
+        except Exception:
+            pass
+
+        return response
+
+    def get_success_url(self):
+        return reverse("timeslot_list", kwargs={"pk": self.object.slot.business_id})
+
+
+class BookingDelete(DeleteView):
+    model = Booking
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        try:
+            delete_event_for_booking(self.object)
+        except Exception:
+            pass
+        
+        return super().delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse("timeslot_list", kwargs={"pk": self.object.business_id})
 
 # ===========================================================================================================
 # Service
