@@ -32,7 +32,7 @@
           {% endif %}
         {% else %}
           {% if user.is_authenticated %}
-            <a href="{% url 'booking_create' slot_id=slot.id %}">Book this slot</a>
+            <a href="{% url 'booking_create' pk=slot.id %}">Book this slot</a>
           {% else %}
             <a href="{% url 'login' %}">Login to book</a>
           {% endif %}
@@ -46,7 +46,7 @@
 </ul>
 
 <p>
-  <a href="{% url 'business_detail' business_id=business.id %}">Back to business</a>
+  <a href="{% url 'business_detail' pk=business.id %}">Back to business</a>
 </p>
 
 {% endblock %}

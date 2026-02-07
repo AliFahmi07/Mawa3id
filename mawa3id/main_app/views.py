@@ -227,10 +227,19 @@ class BookingCreate(CreateView):
     model = Booking
     fields = ['notes']
 
+    def get_slot(self):
+        return get_object_or_404(TimeSlot, pk=self.kwargs["pk"])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        slot = self.get_slot()
+        context['slot'] = slot
+        context['business'] = slot.business
+        return context
+
+
     def form_valid(self, form):
-        slot = get_object_or_404(TimeSlot, pk=self.kwargs["pk"])
-
-
+        slot = self.get_slot()
         if not slot.is_active:
             form.add_error(None, "This slot is not available.")
             return self.form_invalid(form)
@@ -294,7 +303,7 @@ class BookingDelete(DeleteView):
             delete_event_for_booking(self.object)
         except Exception:
             pass
-        
+
         return super().delete(request, *args, **kwargs)
 
     def get_success_url(self):

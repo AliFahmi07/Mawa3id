@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>Edit Booking</h1>
+<h1>book form</h1>
 
 {% if form.non_field_errors %}
   <ul>
@@ -18,7 +18,7 @@
 </form>
 
 <p>
-  <a href="{% url 'timeslot_list' pk=object.slot.business_id %}">Back to slots</a>
+  <a href="{% url 'timeslot_list' pk=slot.business_id %}">Back to slots</a>
 </p>
 
 {% endblock %}
