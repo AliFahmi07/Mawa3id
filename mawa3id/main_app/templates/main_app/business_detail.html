@@ -2,7 +2,7 @@
 
 {% block content %}
       <li>
-      <a href="{% url 'timeslot_create' business_id=business.id %}">Add slot</a>
+      <a href="{% url 'timeslot_create' pk=object.id %}">Add slot</a>
       </li>
 
 {% if object %}

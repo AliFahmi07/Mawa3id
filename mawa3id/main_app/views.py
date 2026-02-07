@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
@@ -39,7 +41,7 @@ def signup(request):
             user.save()
             profile.user = user
             profile.save()
-            login(request, user)
+            login(request, user, backend=settings.AUTHENTICATION_BACKENDS[0],)
             return redirect("/profile")
         else:
             error_message = "Invalid signup - try again"
@@ -176,7 +178,7 @@ class TimeSlotCreate(CreateView):
     form_class = TimeSlotForm
 
     def form_valid(self, form):
-        business = get_object_or_404(Business, pk=self.kwargs['business_id'])
+        business = get_object_or_404(Business, pk=self.kwargs['pk'])
         form.instance.business = business
 
         if business.owner != self.request.user:
@@ -187,7 +189,7 @@ class TimeSlotCreate(CreateView):
 
 
     def get_success_url(self):
-        return reverse('business_detail', kwargs={'business_id': self.object.business_id})
+        return reverse('timeslot_list', kwargs={'pk': self.object.business_id})
 
 
 class TimeSlotList(ListView):
@@ -196,7 +198,7 @@ class TimeSlotList(ListView):
     context_object_name = 'slots'
 
     def get_queryset(self):
-        self.business = get_object_or_404(Business, pk=self.kwargs["business_id"])
+        self.business = get_object_or_404(Business, pk=self.kwargs["pk"])
         return TimeSlot.objects.filter(business=self.business).select_related('service').order_by('start')
 
     def get_context_data(self, **kwargs):
@@ -210,22 +212,22 @@ class TimeSlotUpdate(UpdateView):
     fields = ["service", "start", "duration", "is_active"]
 
     def get_success_url(self):
-        return reverse("timeslot_list", kwargs={"business_id": self.object.business_id})
+        return reverse("timeslot_list", kwargs={"pk": self.object.business_id})
 
 
 class TimeSlotDelete(DeleteView):
     model = TimeSlot
 
     def get_success_url(self):
-        return reverse("timeslot_list", kwargs={"business_id": self.object.business_id})
+        return reverse("timeslot_list", kwargs={"pk": self.object.business_id})
 
 
 class BookingCreate(CreateView):
     model = Booking
-    fields_class = BookingForm
+    fields = ['notes']
 
     def form_valid(self, form):
-        slot = get_object_or_404(TimeSlot, pk=self.kwargs["slot_id"])
+        slot = get_object_or_404(TimeSlot, pk=self.kwargs["pk"])
 
 
         if not slot.is_active:

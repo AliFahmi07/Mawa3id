@@ -33,12 +33,15 @@
         </a>
       </li>
 
-{%if business %}
-      <li>
-        <a href="{%url 'business_detail' %}">
-          Business
-        </a>
-      </li>
+{% if user.is_authenticated %}
+  {% with mybiz=user.business.first %}
+    {% if mybiz %}
+      <a href="{% url 'business_detail' pk=mybiz.id %}">Business</a>
+      <a href="{% url 'timeslot_list' pk=mybiz.id %}">Slots</a>
+    {% else %}
+      <a href="{% url 'business_create' %}">Create Business</a>
+    {% endif %}
+  {% endwith %}
 {% endif %}
 
       {% else %}
