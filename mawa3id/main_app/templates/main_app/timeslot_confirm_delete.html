@@ -8,7 +8,7 @@
   <button type="submit">Yes, delete</button>
 </form>
 
-<a href="{% url 'timeslot_list' business_id=object.business_id %}">Cancel</a>
+<a href="{% url 'timeslot_list' pk=object.business_id %}">Cancel</a>
 {% endblock %}
 
 {% comment %}
