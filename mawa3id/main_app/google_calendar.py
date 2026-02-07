@@ -24,8 +24,14 @@ def _get_owner(booking):
 
 def _get_google_credentials_for_user(user):
     app = SocialApp.objects.get(provider="google")
-    account = SocialAccount.objects.get(user=user, provider="google")
-    token = SocialToken.objects.get(account=account)
+
+    account = SocialAccount.objects.filter(user=user, provider="google").first()
+    if not account:
+        return None
+
+    token = SocialToken.objects.filter(account=account).first()
+    if not token:
+        return None
 
     refresh_token = token.token_secret or None
 
@@ -60,13 +66,17 @@ def _event_body_from_booking(booking):
 def create_event_for_booking(booking, calendar_id="primary"):
     owner = _get_owner(booking)
     creds = _get_google_credentials_for_user(owner)
+
+    if not creds:
+        return None
+
     service = build("calendar", "v3", credentials=creds)
 
     body = _event_body_from_booking(booking)
     created = service.events().insert(calendarId=calendar_id, body=body).execute()
 
     booking.google_calendar_id = calendar_id
-    booking.google_event_id = created["id"]
+    booking.google_event_id = created.get("id")
     booking.save(update_fields=["google_calendar_id", "google_event_id"])
 
     return created

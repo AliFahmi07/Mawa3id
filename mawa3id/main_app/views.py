@@ -213,7 +213,7 @@ class TimeSlotList(ListView):
 
 class TimeSlotUpdate(UpdateView):
     model = TimeSlot
-    fields = ["service", "start", "duration", "is_active"]
+    form_class = TimeSlotForm
 
     def get_success_url(self):
         return reverse("timeslot_list", kwargs={"pk": self.object.business_id})
@@ -249,17 +249,20 @@ class BookingCreate(CreateView):
 
         form.instance.slot = slot
         form.instance.client = self.request.user
-        form.instance.status = Booking.status.PENDING
-
+        form.instance.status = Booking.Status.PENDING
 
         response = super().form_valid(form)
 
         try:
             create_event_for_booking(self.object)
-        except Exception as e:
+        except Exception:
             pass
 
         return response
+
+
+    def get_success_url(self):
+        return reverse("timeslot_list", kwargs={"pk": self.object.slot.business_id})
 
 class BookingUpdate(UpdateView):
     model = Booking
