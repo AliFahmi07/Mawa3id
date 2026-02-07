@@ -17,10 +17,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 def home(request):
-    context = {'business' :  False}
-    if request.user.is_authenticated:
-        user_profile = Profile.objects.get(user = request.user)
-        context = {'business' : True if user_profile.role == "business_owner" else False}
+    context = {}
+    user_profile = getUserProfile(request)
+    if user_profile != None:
+        context.update({'is_business_owner' : True if user_profile.role == "business_owner" else False})
         print(context)
 
     return render(request, "home.html", context)
@@ -77,9 +77,16 @@ class ProfileCreate(CreateView):
 
 class ProfileDetail(DetailView):
     model = Profile
-
     def get_object(self):
         return Profile.objects.get(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user_profile = getUserProfile(self.request)
+        context.update({'is_business_owner' : True if user_profile.role == "business_owner" else False})
+
+        return context
 
 
 class ProfileUpdateView(View):
@@ -240,4 +247,10 @@ class ReviewDelete(LoginRequiredMixin, DeleteView):
 
 
 
-
+#===========================================================================================================
+def getUserProfile(req):
+    if req.user.is_authenticated:
+        user_profile = Profile.objects.get(user = req.user)
+        return user_profile
+    else:
+        return None
