@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Available Slots — {{ business.name }}</h1>
+
+<ul>
+  {% for slot in slots %}
+    <li style="margin-bottom: 14px;">
+      <strong>{{ slot.start }}</strong> ({{ slot.duration }} mins)
+      {% if slot.service %} — {{ slot.service }}{% endif %}
+      {% if slot.is_active %} <span>✅ Active</span> {% else %} <span>⛔ Inactive</span> {% endif %}
+
+      <div style="margin-top: 6px;">
+        <!-- Business owner actions (optional: show only if owner) -->
+        {% if user.is_authenticated and business.owner == user %}
+          <a href="{% url 'timeslot_update' pk=slot.id %}">Edit slot</a>
+          |
+          <a href="{% url 'timeslot_delete' pk=slot.id %}">Delete slot</a>
+        {% endif %}
+      </div>
+
+      <div style="margin-top: 6px;">
+        {% if slot.booking %}
+          <em>Booked by {{ slot.booking.client.username }} ({{ slot.booking.status }})</em>
+
+          {% if user.is_authenticated and slot.booking.client == user %}
+            <div style="margin-top: 6px;">
+              <a href="{% url 'booking_update' pk=slot.booking.id %}">Edit booking</a>
+              |
+              <a href="{% url 'booking_delete' pk=slot.booking.id %}">Cancel booking</a>
+            </div>
+          {% endif %}
+        {% else %}
+          {% if user.is_authenticated %}
+            <a href="{% url 'booking_create' slot_id=slot.id %}">Book this slot</a>
+          {% else %}
+            <a href="{% url 'login' %}">Login to book</a>
+          {% endif %}
+        {% endif %}
+      </div>
+
+    </li>
+  {% empty %}
+    <li>No slots yet.</li>
+  {% endfor %}
+</ul>
+
+<p>
+  <a href="{% url 'business_detail' business_id=business.id %}">Back to business</a>
+</p>
+
+{% endblock %}
