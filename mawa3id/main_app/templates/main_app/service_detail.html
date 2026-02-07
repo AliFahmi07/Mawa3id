@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if service %}
+<h1>Service Detail</h1>
+  <div>
+    <div>
+      <span>{{ service.name }}</span>
+      <span>{{ service.description }}</span>
+      <span>{{ service.price }}</span>
+      <span>{{ service.time }}</span>
+      <div>
+        <a href="{% url 'service_update' service.id %}">Edit</a>
+      </div>
+      <div >
+        <a href="{%url 'business_delete' business.id %}">Delete</a>
+      </div>
+    </div>
+  </div>
+{% else %}
+<a href="{% url 'service_create' %}">
+  Create service
+</a>
+{% endif %}
+
+{% endblock content %}
+
+

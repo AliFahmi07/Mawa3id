@@ -19,3 +19,8 @@ class TimeSlotForm(forms.ModelForm):
         widgets = {
             "start": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
+
+class ProfileCreateForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ["image", "role"]

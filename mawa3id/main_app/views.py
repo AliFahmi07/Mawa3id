@@ -4,10 +4,13 @@ from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import DetailView, ListView
-from .models import Business, Profile, TimeSlot, Booking
+from .models import Business, Profile, Posts, Service
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Business, Profile, Service, Review, TimeSlot, Booking
 from django.urls import reverse
 from django.views import View
-from .forms import UserUpdateForm, ProfileUpdateForm, TimeSlotForm
+from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .google_calendar import create_event_for_booking, update_event_for_booking, delete_event_for_booking
 
@@ -17,33 +20,47 @@ from .google_calendar import create_event_for_booking, update_event_for_booking,
 #Registration
 
 def home(request):
-    return render(request, "home.html")
+    context = {'business' :  False}
+    if request.user.is_authenticated:
+        user_profile = Profile.objects.get(user = request.user)
+        context = {'business' : True if user_profile.role == "business_owner" else False}
+        print(context)
 
+    return render(request, "home.html", context)
 
 def signup(request):
     error_message = ""
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(
-                request,
-                user,
-                backend="django.contrib.auth.backends.ModelBackend"
-                )
-            return redirect("/profile/create/")
+        user_form = UserCreationForm(request.POST)
+        profile_form = ProfileCreateForm(request.POST, request.FILES)
+        if user_form.is_valid():
+            user = user_form.save(commit=False)
+            profile = profile_form.save(commit=False)
+            user.save()
+            profile.user = user
+            profile.save()
+            login(request, user)
+            return redirect("/profile")
         else:
             error_message = "Invalid signup - try again"
-    form = UserCreationForm
-    context = {"form": form, "error_message": error_message}
+
+    user_form = UserCreationForm
+    profile_form = ProfileCreateForm
+
+    context = {"user_form": user_form, "profile_form": profile_form ,"error_message": error_message}
     return render(
         request,
-        "registration/signup.html",
-        context,
+        "registration/signup.html", context
     )
 
-#===========================================================================================================
-#Profile
+def posts_index(request):
+    posts = Posts.objects.filter(user=request.user)
+    return render(request, 'posts/index.html')
+
+def posts_detail(request, posts_id):
+    posts = Posts.objects.get(posts=posts_id)
+    return render(request, 'posts/detail.html', {'posts': posts})
+
 
 class ProfileCreate(CreateView):
     model = Profile
@@ -113,15 +130,43 @@ class BusinessDetail(DetailView):
     template_name = "main_app/business_detail.html"
 
     def get_object(self):
-        return Business.objects.filter(owner=self.request.user).first()
+        return Business.objects.get(owner = self.request.user)
+
+#===========================================================================================================
+#Posts
+class PostCreate(CreateView):
+    model = Posts
+    fields = ['description']
+    template_name = 'posts/posts_form.html'
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+class PostUpdate(UpdateView):
+    model = Posts
+    fields = ['description']
+
+class PostDelete(DeleteView):
+    model = Posts
+    success_url = '/posts/'
 
 
 class BusinessUpdate(UpdateView):
     model = Business
     fields = ["name", "description", "category"]
 
+    def get_queryset(self): # to update the user's business only
+        return Business.objects.filter(owner=self.request.user)
+
     def get_success_url(self):
-        return reverse("business_detail", kwargs={"pk": self.object.pk})
+
+        return reverse("business_detail")
+
+
+class BusinessList(ListView):
+    model = Business
+    template_name = "main_app/businesses"
 
 #===========================================================================================================
 #Appointments
@@ -174,3 +219,80 @@ class TimeSlotDelete(DeleteView):
     def get_success_url(self):
         return reverse("timeslot_list", kwargs={"business_id": self.object.business_id})
 
+
+
+
+
+
+# ===========================================================================================================
+# Service
+
+class ServiceCreate(CreateView):
+    model = Service
+    success_url = "/business/show"
+    fields = ["name", "description", "time", "price"]
+    def form_valid(self, form):
+        form.instance.business_id = Business.objects.get(owner = self.request.user).id
+        return super().form_valid(form)
+
+
+
+class ServiceDetail(DetailView):
+    model = Service
+    template_name = "main_app/service_detail.html"
+
+    def get_object(self):
+        return Service.objects.get(id=self.kwargs["service_id"])
+class ServiceUpdate(UpdateView):
+    model = Service
+    fields = ["name", "description", "time", "price"]
+    template_name = 'main_app/service_form.html'
+
+    def get_success_url(self):
+        return reverse("service_detail", kwargs={'service_id': self.object.id})
+
+
+
+class ServiceDelete(DeleteView):
+    model = Service
+    success_url = "/business/show"
+
+#===========================================================================================================
+#Review
+
+@login_required
+def add_review(request, service_id):
+    """Add a review to a service - prevents duplicates"""
+    service = get_object_or_404(Service, id=service_id)
+
+    # Check if user already reviewed this service
+    if Review.objects.filter(service=service, user=request.user).exists():
+        return redirect('home')
+
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        text = request.POST.get('text', '').strip()
+
+        # Validate
+        if rating and text and len(text) <= 500:
+            Review.objects.create(
+                service=service,
+                user=request.user,
+                rating=int(rating),
+                text=text
+            )
+
+    return redirect('home')
+
+
+class ReviewUpdate(LoginRequiredMixin, UpdateView):
+    model = Review
+    fields = ['rating', 'text']
+    template_name = 'main_app/review_form.html'
+    success_url = '/'
+
+
+class ReviewDelete(LoginRequiredMixin, DeleteView):
+    model = Review
+    template_name = 'main_app/review_confirm_delete.html'
+    success_url = '/'
