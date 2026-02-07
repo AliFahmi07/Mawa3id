@@ -22,7 +22,11 @@ from .google_calendar import create_event_for_booking, update_event_for_booking,
 #Registration
 
 def home(request):
-    return render(request, "home.html")
+    context ={}
+    is_biz_owner = True if Profile.objects.get(user = request.user) else False
+    businesses = Business.objects.all()
+    context.update({"businesses": businesses, 'is_biz_owner': is_biz_owner})
+    return render(request, "home.html", context)
 
 def signup(request):
     error_message = ""
