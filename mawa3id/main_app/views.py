@@ -126,8 +126,14 @@ class BusinessCreate(CreateView):
     success_url = "/"
 
     def form_valid(self, form):
-        form.instance.owner = self.request.user
-        return super().form_valid(form)
+        user = self.request.user
+
+        if Business.objects.get(owner = user) :
+            form.add_error(None, "you already have a business")
+            return self.form_invalid(form)
+        else:
+            form.instance.owner = self.request.user
+            return super().form_valid(form)
 
 
 class BusinessDetail(DetailView):
