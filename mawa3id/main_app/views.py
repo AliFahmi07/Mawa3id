@@ -119,12 +119,14 @@ class BusinessCreate(CreateView):
     def form_valid(self, form):
         user = self.request.user
 
-        if Business.objects.get(owner = user) :
+        if Business.objects.filter(owner=user).exists():
             form.add_error(None, "you already have a business")
             return self.form_invalid(form)
-        else:
-            form.instance.owner = self.request.user
-            return super().form_valid(form)
+
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+
 
 
 class BusinessDetail(DetailView):
@@ -162,8 +164,7 @@ class BusinessUpdate(UpdateView):
         return Business.objects.filter(owner=self.request.user)
 
     def get_success_url(self):
-
-        return reverse("business_detail")
+        return reverse("business_detail", kwargs={'pk':self.request.user.id})
 
 
 class BusinessList(ListView):
@@ -226,10 +227,19 @@ class BookingCreate(CreateView):
     model = Booking
     fields = ['notes']
 
+    def get_slot(self):
+        return get_object_or_404(TimeSlot, pk=self.kwargs["pk"])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        slot = self.get_slot()
+        context['slot'] = slot
+        context['business'] = slot.business
+        return context
+
+
     def form_valid(self, form):
-        slot = get_object_or_404(TimeSlot, pk=self.kwargs["pk"])
-
-
+        slot = self.get_slot()
         if not slot.is_active:
             form.add_error(None, "This slot is not available.")
             return self.form_invalid(form)
@@ -263,17 +273,55 @@ class BookingCreate(CreateView):
 class BookingUpdate(UpdateView):
     model = Booking
     fields = [""]
+    template_name="main_app/booking_form.html"
+
+    def get_queryset(self):
+        return Booking.objects.filter(client=self.request.user)
+
+    def form_valid(self, form):
+
+        response = super().form_valid(form)
+
+        try:
+            create_event_for_booking(self.object)
+        except Exception:
+            pass
+
+        return response
+
+    def get_success_url(self):
+        return reverse("timeslot_list", kwargs={"pk": self.object.slot.business_id})
+
+
+class BookingDelete(DeleteView):
+    model = Booking
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        try:
+            delete_event_for_booking(self.object)
+        except Exception:
+            pass
+
+        return super().delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse("timeslot_list", kwargs={"pk": self.object.business_id})
 
 # ===========================================================================================================
 # Service
 
 class ServiceCreate(CreateView):
     model = Service
-    success_url = "/business/show"
+
     fields = ["name", "description", "time", "price"]
     def form_valid(self, form):
         form.instance.business_id = Business.objects.get(owner = self.request.user).id
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('business_detail', kwargs={'pk':self.object.business.id})
 
 
 

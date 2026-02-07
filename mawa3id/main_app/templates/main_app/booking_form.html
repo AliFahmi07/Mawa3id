@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>{% if object %}Update Booking{% else %}Create Booking{% endif %}</h1>
+<h1>book form</h1>
 
 {% if form.non_field_errors %}
   <ul>
@@ -13,16 +13,15 @@
 
 <form method="post">
   {% csrf_token %}
-
   {{ form.as_p }}
-
-  <button type="submit">
-    {% if object %}Save Changes{% else %}Book{% endif %}
-  </button>
+  <button type="submit">Save</button>
 </form>
 
 <p>
-  <a href="javascript:history.back()">Back</a>
+  <a href="{% url 'timeslot_list' pk=slot.business_id %}">Back to slots</a>
 </p>
 
 {% endblock %}
+
+
+{% comment %} Temporary html only {% endcomment %}

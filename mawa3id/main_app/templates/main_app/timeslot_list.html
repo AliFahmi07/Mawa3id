@@ -1,69 +1,52 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>{{ business.name }} — Slots</h1>
+<h1>Available Slots — {{ business.name }}</h1>
 
-<div style="margin-bottom: 16px;">
-  <a href="{% url 'timeslot_create' pk=business.id %}">+ Add Slot</a>
-  <span style="margin-left: 12px;">
-    <a href="{% url 'business_detail' pk=business.id %}">Back to Business</a>
-  </span>
-</div>
+<ul>
+  {% for slot in slots %}
+    <li style="margin-bottom: 14px;">
+      <strong>{{ slot.start }}</strong> ({{ slot.duration }} mins)
+      {% if slot.service %} — {{ slot.service }}{% endif %}
+      {% if slot.is_active %} <span>✅ Active</span> {% else %} <span>⛔ Inactive</span> {% endif %}
 
-{% if slots %}
-  <ul>
-    {% for slot in slots %}
-      <li style="margin-bottom: 14px; padding: 10px; border: 1px solid #ddd;">
-        <div>
-          <strong>Start:</strong> {{ slot.start }}
-        </div>
-
-        <div>
-          <strong>Duration:</strong> {{ slot.duration }} mins
-        </div>
-
-        <div>
-          <strong>Service:</strong>
-          {% if slot.service %}
-            {{ slot.service.name }}
-          {% else %}
-            —
-          {% endif %}
-        </div>
-
-        <div>
-          <strong>Status:</strong>
-          {% if slot.is_active %}
-            Active
-          {% else %}
-            Inactive
-          {% endif %}
+      <div style="margin-top: 6px;">
+        <!-- Business owner actions (optional: show only if owner) -->
+        {% if user.is_authenticated and business.owner == user %}
+          <a href="{% url 'timeslot_update' pk=slot.id %}">Edit slot</a>
           |
-          {% if slot.booking %}
-            Booked ({{ slot.booking.status }})
+          <a href="{% url 'timeslot_delete' pk=slot.id %}">Delete slot</a>
+        {% endif %}
+      </div>
+
+      <div style="margin-top: 6px;">
+        {% if slot.booking %}
+          <em>Booked by {{ slot.booking.client.username }} ({{ slot.booking.status }})</em>
+
+          {% if user.is_authenticated and slot.booking.client == user %}
+            <div style="margin-top: 6px;">
+              <a href="{% url 'booking_update' pk=slot.booking.id %}">Edit booking</a>
+              |
+              <a href="{% url 'booking_delete' pk=slot.booking.id %}">Cancel booking</a>
+            </div>
+          {% endif %}
+        {% else %}
+          {% if user.is_authenticated %}
+            <a href="{% url 'booking_create' pk=slot.id %}">Book this slot</a>
           {% else %}
-            Available
+            <a href="{% url 'login' %}">Login to book</a>
           {% endif %}
-        </div>
+        {% endif %}
+      </div>
 
-        <div style="margin-top: 10px;">
-          <!-- Owner actions -->
-          <a href="{% url 'timeslot_update' pk=slot.id %}">Edit</a>
-          <span style="margin: 0 8px;">|</span>
-          <a href="{% url 'timeslot_delete' pk=slot.id %}">Delete</a>
+    </li>
+  {% empty %}
+    <li>No slots yet.</li>
+  {% endfor %}
+</ul>
 
-          {% if slot.is_active and not slot.booking and slot.start > now %}
-            <span style="margin: 0 8px;">|</span>
-            <!-- Client booking action -->
-            <a href="{% url 'booking_create' pk=slot.id %}">Book</a>
-          {% endif %}
-        </div>
-      </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>No slots yet.</p>
-  <p><a href="{% url 'timeslot_create' pk=business.id %}">Create the first slot</a></p>
-{% endif %}
+<p>
+  <a href="{% url 'business_detail' pk=business.id %}">Back to business</a>
+</p>
 
 {% endblock %}

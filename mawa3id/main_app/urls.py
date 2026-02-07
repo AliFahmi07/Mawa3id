@@ -22,6 +22,8 @@ urlpatterns = [
     path('slot/<int:pk>/delete', views.TimeSlotDelete.as_view(), name='timeslot_delete'),
 
     path('slot/<int:pk>/book', views.BookingCreate.as_view(), name='booking_create'),
+    path('booking/<int:pk>/update', views.BookingUpdate.as_view(), name='booking_update'),
+    path('booking/<int:pk>/delete', views.BookingDelete.as_view(), name='booking_delete'),
 
 
     # SERVICE
