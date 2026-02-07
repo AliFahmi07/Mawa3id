@@ -164,8 +164,7 @@ class BusinessUpdate(UpdateView):
         return Business.objects.filter(owner=self.request.user)
 
     def get_success_url(self):
-
-        return reverse("business_detail")
+        return reverse("business_detail", kwargs={'pk':self.request.user.id})
 
 
 class BusinessList(ListView):
@@ -271,11 +270,14 @@ class BookingUpdate(UpdateView):
 
 class ServiceCreate(CreateView):
     model = Service
-    success_url = "/business/show"
+
     fields = ["name", "description", "time", "price"]
     def form_valid(self, form):
         form.instance.business_id = Business.objects.get(owner = self.request.user).id
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('business_detail', kwargs={'pk':self.object.business.id})
 
 
 
