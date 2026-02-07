@@ -200,7 +200,6 @@ class ServiceUpdate(UpdateView):
         return reverse("service_detail", kwargs={'service_id': self.object.id})
 
 
-
 class ServiceDelete(DeleteView):
     model = Service
     success_url = "/business/show"
