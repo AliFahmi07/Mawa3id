@@ -22,11 +22,7 @@ from .google_calendar import create_event_for_booking, update_event_for_booking,
 #Registration
 
 def home(request):
-    context ={}
-    is_biz_owner = True if Profile.objects.get(user = request.user) else False
-    businesses = Business.objects.all()
-    context.update({"businesses": businesses, 'is_biz_owner': is_biz_owner})
-    return render(request, "home.html", context)
+    return render(request, "home.html")
 
 def signup(request):
     error_message = ""
@@ -123,12 +119,14 @@ class BusinessCreate(CreateView):
     def form_valid(self, form):
         user = self.request.user
 
-        if Business.objects.get(owner = user) :
+        if Business.objects.filter(owner=user).exists():
             form.add_error(None, "you already have a business")
             return self.form_invalid(form)
-        else:
-            form.instance.owner = self.request.user
-            return super().form_valid(form)
+
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+
 
 
 class BusinessDetail(DetailView):
