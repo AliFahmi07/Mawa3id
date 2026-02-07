@@ -22,10 +22,10 @@ from .google_calendar import create_event_for_booking, update_event_for_booking,
 #Registration
 
 def home(request):
-    context = {'business' :  False}
-    if request.user.is_authenticated:
-        user_profile = Profile.objects.get(user = request.user)
-        context = {'business' : True if user_profile.role == "business_owner" else False}
+    context = {}
+    user_profile = getUserProfile(request)
+    if user_profile != None:
+        context.update({'is_business_owner' : True if user_profile.role == "business_owner" else False})
         print(context)
 
     return render(request, "home.html", context)
@@ -80,9 +80,16 @@ class ProfileCreate(CreateView):
 
 class ProfileDetail(DetailView):
     model = Profile
-
     def get_object(self):
         return Profile.objects.get(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user_profile = getUserProfile(self.request)
+        context.update({'is_business_owner' : True if user_profile.role == "business_owner" else False})
+
+        return context
 
 
 class ProfileUpdateView(View):
@@ -123,8 +130,14 @@ class BusinessCreate(CreateView):
     success_url = "/"
 
     def form_valid(self, form):
-        form.instance.owner = self.request.user
-        return super().form_valid(form)
+        user = self.request.user
+
+        if Business.objects.get(owner = user) :
+            form.add_error(None, "you already have a business")
+            return self.form_invalid(form)
+        else:
+            form.instance.owner = self.request.user
+            return super().form_valid(form)
 
 
 class BusinessDetail(DetailView):
@@ -286,7 +299,6 @@ class ServiceUpdate(UpdateView):
         return reverse("service_detail", kwargs={'service_id': self.object.id})
 
 
-
 class ServiceDelete(DeleteView):
     model = Service
     success_url = "/business/show"
@@ -330,3 +342,13 @@ class ReviewDelete(LoginRequiredMixin, DeleteView):
     model = Review
     template_name = 'main_app/review_confirm_delete.html'
     success_url = '/'
+
+
+
+#===========================================================================================================
+def getUserProfile(req):
+    if req.user.is_authenticated:
+        user_profile = Profile.objects.get(user = req.user)
+        return user_profile
+    else:
+        return None

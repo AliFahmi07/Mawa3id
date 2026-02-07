@@ -33,6 +33,12 @@
         </a>
       </li>
 
+{%if is_business_owner %}
+      <li>
+        <a href="{%url 'business_detail' %}">
+          Business
+        </a>
+      </li>
 {% if user.is_authenticated %}
   {% with mybiz=user.business.first %}
     {% if mybiz %}
