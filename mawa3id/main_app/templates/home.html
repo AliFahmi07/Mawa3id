@@ -1,4 +1,11 @@
 {%extends 'base.html'%}
 {%block content%}
 <p>Hello</p>
+
+
+<ul>
+  {% for buiz in businesses %}
+    <li>{{buiz.name}}
+  {% endfor %}
+</ul>
 {%endblock%}

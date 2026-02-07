@@ -1,0 +1,4 @@
+.env
+__pycach__/
+migrations/
+path/

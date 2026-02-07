@@ -119,12 +119,14 @@ class BusinessCreate(CreateView):
     def form_valid(self, form):
         user = self.request.user
 
-        if Business.objects.get(owner = user) :
+        if Business.objects.filter(owner=user).exists():
             form.add_error(None, "you already have a business")
             return self.form_invalid(form)
-        else:
-            form.instance.owner = self.request.user
-            return super().form_valid(form)
+
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+
 
 
 class BusinessDetail(DetailView):
