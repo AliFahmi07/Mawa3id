@@ -220,8 +220,40 @@ class TimeSlotDelete(DeleteView):
         return reverse("timeslot_list", kwargs={"business_id": self.object.business_id})
 
 
+class BookingCreate(CreateView):
+    model = Booking
+    fields_class = BookingForm
+
+    def form_valid(self, form):
+        slot = get_object_or_404(TimeSlot, pk=self.kwargs["slot_id"])
 
 
+        if not slot.is_active:
+            form.add_error(None, "This slot is not available.")
+            return self.form_invalid(form)
+
+        if hasattr(slot, "booking"):
+            form.add_error(None, "This slot is already booked, please choose another slot.")
+            return self.form_invalid(form)
+
+        if slot.start <= timezone.now():
+            form.add_error(None, "Please just an appropriate time!")
+            return self.form_invalid(form)
+
+
+        form.instance.slot = slot
+        form.instance.client = self.request.user
+        form.instance.status = Booking.status.PENDING
+
+
+        response = super().form_valid(form)
+
+        try:
+            create_event_for_booking(self.object)
+        except Exception as e:
+            pass
+
+        return response
 
 
 # ===========================================================================================================
