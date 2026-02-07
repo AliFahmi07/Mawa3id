@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{% if object %}Update Booking{% else %}Create Booking{% endif %}</h1>
+
+{% if form.non_field_errors %}
+  <ul>
+    {% for err in form.non_field_errors %}
+      <li style="color:red;">{{ err }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+
+  {{ form.as_p }}
+
+  <button type="submit">
+    {% if object %}Save Changes{% else %}Book{% endif %}
+  </button>
+</form>
+
+<p>
+  <a href="javascript:history.back()">Back</a>
+</p>
+
+{% endblock %}

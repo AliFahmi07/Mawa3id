@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
@@ -7,14 +9,17 @@ from django.views.generic import DetailView, ListView
 from .models import Business, Profile, Posts, Service
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Business, Profile, Service, Review
+from .models import Business, Profile, Service, Review, TimeSlot, Booking
 from django.urls import reverse
 from django.views import View
-from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm
+from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .google_calendar import create_event_for_booking, update_event_for_booking, delete_event_for_booking
 
 # Create your views here.
 
+#===========================================================================================================
+#Registration
 
 def home(request):
     context = {}
@@ -36,7 +41,7 @@ def signup(request):
             user.save()
             profile.user = user
             profile.save()
-            login(request, user)
+            login(request, user, backend=settings.AUTHENTICATION_BACKENDS[0],)
             return redirect("/profile")
         else:
             error_message = "Invalid signup - try again"
@@ -59,8 +64,6 @@ def posts_detail(request, posts_id):
     return render(request, 'posts/detail.html', {'posts': posts})
 
 
-# ===========================================================================================================
-# Profile
 class ProfileCreate(CreateView):
     model = Profile
     fields = ["image", "role"]
@@ -71,7 +74,7 @@ class ProfileCreate(CreateView):
 
     def get_success_url(self):
         if self.object.role == Profile.Role.BUSINESS_OWNER:
-            return reverse("create_business")
+            return reverse("business_create")
         return reverse("home")
 
 
@@ -118,8 +121,9 @@ class ProfileUpdateView(View):
         )
 
 
-# ===========================================================================================================
+#===========================================================================================================
 # Business
+
 class BusinessCreate(CreateView):
     model = Business
     fields = ["name", "description", "category"]
@@ -171,12 +175,101 @@ class BusinessUpdate(UpdateView):
         return Business.objects.filter(owner=self.request.user)
 
     def get_success_url(self):
+
         return reverse("business_detail")
 
 
 class BusinessList(ListView):
     model = Business
     template_name = "main_app/businesses"
+
+#===========================================================================================================
+#Appointments
+
+class TimeSlotCreate(CreateView):
+    model = TimeSlot
+    form_class = TimeSlotForm
+
+    def form_valid(self, form):
+        business = get_object_or_404(Business, pk=self.kwargs['pk'])
+        form.instance.business = business
+
+        if business.owner != self.request.user:
+            form.add_error(None, "Only the business owner can create time slots.")
+            return self.form_invalid(form)
+
+        return super().form_valid(form)
+
+
+    def get_success_url(self):
+        return reverse('timeslot_list', kwargs={'pk': self.object.business_id})
+
+
+class TimeSlotList(ListView):
+    model = TimeSlot
+    template_name = 'main_app/timeslot_list.html'
+    context_object_name = 'slots'
+
+    def get_queryset(self):
+        self.business = get_object_or_404(Business, pk=self.kwargs["pk"])
+        return TimeSlot.objects.filter(business=self.business).select_related('service').order_by('start')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["business"] = self.business
+        return context
+
+
+class TimeSlotUpdate(UpdateView):
+    model = TimeSlot
+    fields = ["service", "start", "duration", "is_active"]
+
+    def get_success_url(self):
+        return reverse("timeslot_list", kwargs={"pk": self.object.business_id})
+
+
+class TimeSlotDelete(DeleteView):
+    model = TimeSlot
+
+    def get_success_url(self):
+        return reverse("timeslot_list", kwargs={"pk": self.object.business_id})
+
+
+class BookingCreate(CreateView):
+    model = Booking
+    fields = ['notes']
+
+    def form_valid(self, form):
+        slot = get_object_or_404(TimeSlot, pk=self.kwargs["pk"])
+
+
+        if not slot.is_active:
+            form.add_error(None, "This slot is not available.")
+            return self.form_invalid(form)
+
+        if hasattr(slot, "booking"):
+            form.add_error(None, "This slot is already booked, please choose another slot.")
+            return self.form_invalid(form)
+
+        if slot.start <= timezone.now():
+            form.add_error(None, "Please just an appropriate time!")
+            return self.form_invalid(form)
+
+
+        form.instance.slot = slot
+        form.instance.client = self.request.user
+        form.instance.status = Booking.status.PENDING
+
+
+        response = super().form_valid(form)
+
+        try:
+            create_event_for_booking(self.object)
+        except Exception as e:
+            pass
+
+        return response
+
 
 # ===========================================================================================================
 # Service
