@@ -257,6 +257,9 @@ class BookingCreate(CreateView):
 
         return response
 
+class BookingUpdate(UpdateView):
+    model = Booking
+    fields = [""]
 
 # ===========================================================================================================
 # Service
