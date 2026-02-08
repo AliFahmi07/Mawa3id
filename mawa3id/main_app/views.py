@@ -314,10 +314,10 @@ class BookingDelete(DeleteView):
 
 class ServiceCreate(CreateView):
     model = Service
-
     fields = ["name", "description", "time", "price"]
+
     def form_valid(self, form):
-        form.instance.business_id = Business.objects.get(owner = self.request.user).id
+        form.instance.business = Business.objects.get(owner = self.request.user)
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -331,18 +331,20 @@ class ServiceDetail(DetailView):
 
     def get_object(self):
         return Service.objects.get(id=self.kwargs["service_id"])
+
 class ServiceUpdate(UpdateView):
     model = Service
     fields = ["name", "description", "time", "price"]
     template_name = 'main_app/service_form.html'
 
     def get_success_url(self):
-        return reverse("service_detail", kwargs={'service_id': self.object.id})
+        return reverse("service_detail", kwargs={'service_id': self.object.id, })
 
 
 class ServiceDelete(DeleteView):
     model = Service
-    success_url = "/business/show"
+    def get_success_url(self):
+        return reverse('business_detail')
 
 #===========================================================================================================
 #Review

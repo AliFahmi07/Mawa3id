@@ -27,10 +27,10 @@ urlpatterns = [
 
 
     # SERVICE
-    path('business/service/create/', views.ServiceCreate.as_view(), name= 'service_create'),
-    path('business/service/<int:service_id>', views.ServiceDetail.as_view(), name= 'service_detail'),
-    path('business/service/<int:pk>/update/', views.ServiceUpdate.as_view(), name= 'service_update'),
-    path('business/service/<int:pk>/delete', views.ServiceDelete.as_view(), name= 'service_delete'),
+    path('business/<int:pk>/service/create/', views.ServiceCreate.as_view(), name= 'service_create'),
+    path('business/<int:pk>/service/<int:service_id>', views.ServiceDetail.as_view(), name= 'service_detail'),
+    path('business/<int:pk>/service/<int:service_id>/update/', views.ServiceUpdate.as_view(), name= 'service_update'),
+    path('business/<int:pk>/service/<int:service_id>/delete', views.ServiceDelete.as_view(), name= 'service_delete'),
 
     # POSTS
     path('posts/', views.posts_index, name='posts_index'),
