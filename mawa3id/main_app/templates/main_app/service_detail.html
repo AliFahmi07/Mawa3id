@@ -11,10 +11,10 @@
       <span>{{ service.price }}</span>
       <span>{{ service.time }}</span>
       <div>
-        <a href="{% url 'service_update' pk= service_id=service.id  %}">Edit</a>
+        <a href="{% url 'service_update' pk=service.business.id service_id=service.id  %}">Edit</a>
       </div>
       <div >
-        <a href="{%url 'business_delete' business.id %}">Delete</a>
+        <a href="{%url 'service_delete' pk=service.business.id service_id=service.id %}">Delete</a>
       </div>
     </div>
   </div>

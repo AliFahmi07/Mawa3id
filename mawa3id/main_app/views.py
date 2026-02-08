@@ -317,7 +317,7 @@ class ServiceCreate(CreateView):
     fields = ["name", "description", "time", "price"]
 
     def form_valid(self, form):
-        form.instance.business_id = Business.objects.get(owner = self.request.user).id
+        form.instance.business = Business.objects.get(owner = self.request.user)
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -343,7 +343,8 @@ class ServiceUpdate(UpdateView):
 
 class ServiceDelete(DeleteView):
     model = Service
-    success_url = "/business/show"
+    def get_success_url(self):
+        return reverse('business_detail')
 
 #===========================================================================================================
 #Review
