@@ -158,35 +158,65 @@ class Review(models.Model):
 
 #===========================================================================================================
 
-class Appointment(models.Model):
+class TimeSlot(models.Model):
+    business = models.ForeignKey(
+        Business,
+        on_delete=models.CASCADE,
+        related_name="slots",
+    )
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        blank = True,
+        null = True,
+        related_name="slots",
+    )
+
+    start = models.DateTimeField()
+    duration = models.PositiveIntegerField()
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.business.name} | {self.start} - {self.duration}"
+
+    @property
+    def is_booked(self):
+        return hasattr(self, "booking")
+
+
+
+class Booking(models.Model):
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
         CONFIRMED = "confirmed", "Confirmed"
         CANCELLED = "cancelled", "Cancelled"
         COMPLETED = "completed", "Completed"
 
-    business = models.ForeignKey(
-        Business,
+    slot = models.OneToOneField(
+        TimeSlot,
         on_delete=models.CASCADE,
-        related_name="appointments",
-        )
-
-    user = models.ForeignKey(
+        related_name="booking",
+    )
+    client = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="appointments",
-        )
-
-    service = models.ForeignKey(
-        Service,
-        on_delete=models.CASCADE,
-        related_name="appointments",
-        )
-
+        related_name="bookings"
+    )
     status = models.CharField(
+        max_length=20,
         choices=Status.choices,
         default=Status.PENDING,
-        )
+    )
+
+    notes = models.TextField(blank = True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Google Calendar
+    google_event_id = models.CharField(max_length=255, blank=True, null=True)
+    google_calendar_id = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.user} - {self.service.name} - {self.status}"
+        return f"{self.client.username} | {self.slot.business.name} | {self.slot.start}"

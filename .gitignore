@@ -1,3 +1,4 @@
 .env
-__pycache__/
+__pycach__/
 migrations/
+path/

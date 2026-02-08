@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+      <li>
+      <a href="{% url 'timeslot_create' pk=object.id %}">Add slot</a>
+      </li>
 
 {% if object %}
 <h1>Business</h1>
@@ -29,13 +32,13 @@
         <p>{{ service.description }}</p>
         <p>Price: ${{ service.price }}</p>
         <p>Duration: {{ service.time }} mins</p>
-        
+
         <h4>Reviews ({{ service.reviews.count }})</h4>
-        
+
         {% if service.reviews.count %}
             {% for review in service.reviews.all %}
             <div class="review-card">
-                {{ review.user.username }} - 
+                {{ review.user.username }} -
                 {% if review.rating == 5 %}5
                 {% elif review.rating == 4 %}4
                 {% elif review.rating == 3 %}3
@@ -43,7 +46,7 @@
                 {% else %}1
                 {% endif %}
                 <p>{{ review.text }}</p>
-                
+
                 {% if user == review.user %}
                 <div>
                     <a href="{% url 'review_update' review.id %}" class="btn-small">Edit</a>
@@ -55,13 +58,13 @@
         {% else %}
             <p>No reviews yet. Be the first!</p>
         {% endif %}
-        
+
         {% if user.is_authenticated %}
         <div class="add-review">
             <h5>Write a Review</h5>
             <form action="{% url 'add_review' service.id %}" method="post">
                 {% csrf_token %}
-                
+
                 <label for="rating">Rating:</label>
                 <select name="rating" required>
                     <option value="">Select Rating</option>
@@ -71,10 +74,10 @@
                     <option value="2">(2)</option>
                     <option value="1">(1)</option>
                 </select>
-                
+
                 <label for="text">Your Review:</label>
                 <textarea name="text" placeholder="Write your review..." maxlength="500" rows="3" required></textarea>
-                
+
                 <button type="submit" class="btn">Submit Review</button>
             </form>
         </div>
@@ -90,11 +93,9 @@
 {% endif %}
 
 {% else %}
-<a href="{% url 'business_create' %}">
-  Create business
+<a href="{%url 'business_create' %}">
+  create business
 </a>
 {% endif %}
 
 {% endblock content %}
-
-

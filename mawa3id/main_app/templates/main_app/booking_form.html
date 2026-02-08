@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>book form</h1>
+
+{% if form.non_field_errors %}
+  <ul>
+    {% for err in form.non_field_errors %}
+      <li style="color:red;">{{ err }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Save</button>
+</form>
+
+<p>
+  <a href="{% url 'timeslot_list' pk=slot.business_id %}">Back to slots</a>
+</p>
+
+{% endblock %}
+
+
+{% comment %} Temporary html only {% endcomment %}

@@ -11,39 +11,31 @@
 
   <body>
     <nav>
-      {% if user.is_authenticated %}
-      <li>
-        <form method="post" action="{% url 'logout' %}">
-          {% csrf_token %}
-          <button type="submit">Logout</button>
-        </form>
-      </li>
+  {% if user.is_authenticated %}
+    <li>
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+      </form>
+    </li>
 
-      <li>
-        <a href="{%url 'profile_detail'%}">
-          My Profile
-        </a>
-      </li>
+    <li><a href="{% url 'home' %}">Home</a></li>
+    <li><a href="{% url 'profile_detail' %}">My Profile</a></li>
 
-      <li>
-        <a href="{%url 'home'%}">
-          Home
-        </a>
-      </li>
-
-      <li>
-        <a href="{%url 'business_detail' %}">
-          Business
-        </a>
-      </li>
-
-
-
+    {% with mybiz=user.businesses.first %}
+      {% if mybiz %}
+        <li><a href="{% url 'business_detail' pk=mybiz.id %}">Business</a></li>
+        <li><a href="{% url 'timeslot_list' pk=mybiz.id %}">Slots</a></li>
       {% else %}
-      <li><a href="{% url 'login' %}">Login</a></li>
-      <li><a href="{% url 'signup' %}">Signup</a></li>
+        <li><a href="{% url 'business_create' %}">Create Business</a></li>
       {% endif %}
-    </nav>
+    {% endwith %}
+
+  {% else %}
+    <li><a href="{% url 'login' %}">Login</a></li>
+    <li><a href="{% url 'signup' %}">Signup</a></li>
+  {% endif %}
+</nav>
 
     {%block content%} {%endblock%}
   </body>

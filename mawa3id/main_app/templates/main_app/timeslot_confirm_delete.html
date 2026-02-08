@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Delete slot?</h1>
+<p>{{ object.start }} — {{ object.duration }} mins</p>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit">Yes, delete</button>
+</form>
+
+<a href="{% url 'timeslot_list' pk=object.business_id %}">Cancel</a>
+{% endblock %}
+
+{% comment %}
+TEMPORARY HTML FOR TESTING
+{% endcomment %}

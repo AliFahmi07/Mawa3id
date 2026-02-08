@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Delete Booking</h1>
+<p>Are you sure you want to delete this booking?</p>
+
+<ul>
+  <li><strong>Business:</strong> {{ object.slot.business.name }}</li>
+  <li><strong>Start:</strong> {{ object.slot.start }}</li>
+  <li><strong>Duration:</strong> {{ object.slot.duration }} mins</li>
+</ul>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" style="color:white;background:red;">Yes, delete</button>
+</form>
+
+<p>
+  <a href="{% url 'timeslot_list' pk=object.slot.business_id %}">Cancel</a>
+</p>
+
+{% endblock %}
+
+
+{% comment %} Temporary html only {% endcomment %}
