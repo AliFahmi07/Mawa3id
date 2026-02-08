@@ -330,7 +330,7 @@ class ServiceDetail(DetailView):
     template_name = "main_app/service_detail.html"
 
     def get_object(self):
-        return Service.objects.get(id=self.kwargs["service_id"])
+        return get_object_or_404(Service, id=self.kwargs["service_id"])
 
 class ServiceUpdate(UpdateView):
     model = Service
@@ -343,8 +343,10 @@ class ServiceUpdate(UpdateView):
 
 class ServiceDelete(DeleteView):
     model = Service
+    pk_url_kwarg = "service_id"
+
     def get_success_url(self):
-        return reverse('business_detail')
+        return reverse("business_detail", kwargs={"pk": self.kwargs["pk"]})
 
 #===========================================================================================================
 #Review
