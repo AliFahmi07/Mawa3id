@@ -137,10 +137,11 @@ class BusinessDetail(DetailView):
         return Business.objects.get(owner = self.request.user)
 
 #===========================================================================================================
-#Posts
+#POSTS
+
 class PostCreate(CreateView):
     model = Posts
-    fields = ['description']
+    fields = ['description', 'price']
     template_name = 'posts/posts_form.html'
 
     def form_valid(self, form):
