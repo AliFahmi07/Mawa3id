@@ -134,7 +134,7 @@ class BusinessDetail(DetailView):
     template_name = "main_app/business_detail.html"
 
     def get_object(self):
-        return Business.objects.get(owner = self.request.user)
+        return get_object_or_404(Business, pk=self.kwargs["pk"])
 
 #===========================================================================================================
 #POSTS
@@ -356,14 +356,15 @@ class ServiceDelete(DeleteView):
 def add_review(request, service_id):
     """Add a review to a service - prevents duplicates"""
     service = get_object_or_404(Service, id=service_id)
+    business_id = service.business_id
 
     # Only clients can write reviews
     if request.user.profile.role != Profile.Role.CLIENT:
-        return redirect('home')
+        return redirect("business_detail", pk=business_id)
 
     # Check if user already reviewed this service
     if Review.objects.filter(service=service, user=request.user).exists():
-        return redirect('home')
+        return redirect("business_detail", pk=business_id)
 
     if request.method == 'POST':
         rating = request.POST.get('rating')
@@ -378,20 +379,24 @@ def add_review(request, service_id):
                 text=text
             )
 
-    return redirect('home')
+    return redirect("business_detail", pk=business_id)
 
 
 class ReviewUpdate(LoginRequiredMixin, UpdateView):
     model = Review
     fields = ['rating', 'text']
     template_name = 'main_app/review_form.html'
-    success_url = '/'
+
+    def get_success_url(self):
+        return reverse("business_detail", kwargs={"pk": self.object.service.business_id})
 
 
 class ReviewDelete(LoginRequiredMixin, DeleteView):
     model = Review
     template_name = 'main_app/review_confirm_delete.html'
-    success_url = '/'
+
+    def get_success_url(self):
+        return reverse("business_detail", kwargs={"pk": self.object.service.business_id})
 
 
 
