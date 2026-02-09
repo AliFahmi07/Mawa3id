@@ -158,9 +158,8 @@ class PostUpdate(UpdateView):
 
 class PostDelete(DeleteView):
     model = Posts
+    template_name = 'posts/posts_confirm_delete.html'
     success_url = '/posts/'
-
-
 class BusinessUpdate(UpdateView):
     model = Business
     fields = ["name", "description", "category"]
