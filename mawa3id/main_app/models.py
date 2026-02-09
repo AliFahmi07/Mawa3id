@@ -73,6 +73,8 @@ class Posts(models.Model):
         Business,
         on_delete=models.CASCADE,
         related_name="posts",
+        null=True,
+        blank=True,
         )
 
     description = models.TextField()
