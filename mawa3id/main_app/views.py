@@ -182,6 +182,16 @@ def post_accept(request, posts_id):
     if post.user == request.user:
         return redirect('posts_index')
     
+    if post.business:
+        return redirect('posts_index')
+    
+    if not Business.objects.filter(owner=request.user).exists():
+        return redirect('business_create')
+    
+    business = Business.objects.get(owner=request.user)
+    post.business = business
+    post.save()
+    
     return render(request, 'posts/post_accepted.html', {'post': post})
 
 class BusinessUpdate(UpdateView):
