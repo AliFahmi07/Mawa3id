@@ -162,13 +162,26 @@ class PostUpdate(UpdateView):
     template_name = 'posts/posts_form.html'
     success_url = '/posts/'
 
+    def get_queryset(self):
+        return Posts.objects.filter(user=self.request.user)
+
 class PostDelete(DeleteView):
     model = Posts
     template_name = 'posts/posts_confirm_delete.html'
     success_url = '/posts/'
 
+    def get_queryset(self):
+        return Posts.objects.filter(user=self.request.user)
+
 def post_accept(request, posts_id):
     post = Posts.objects.get(id=posts_id)
+    
+    if request.user.profile.role != 'business_owner':
+        return redirect('posts_index')
+    
+    if post.user == request.user:
+        return redirect('posts_index')
+    
     return render(request, 'posts/post_accepted.html', {'post': post})
 
 class BusinessUpdate(UpdateView):

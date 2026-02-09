@@ -15,11 +15,6 @@
       <hr>
     </div>
     </a>
-    {% if user.profile.role == 'business_owner' %}
-      <div class="card-action">
-        <a href="{% url 'post_accept' post.id %}">Accept</a>
-      </div>
-    {% endif %}
   </div>
 {% endfor %}
 
