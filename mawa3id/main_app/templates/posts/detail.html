@@ -6,11 +6,20 @@
     <span class="card-title">{{ posts.user }}</span>
     <p>Description: {{ posts.description }}</p>
     <p>Price: ${{ posts.price }}</p>
+    {% if posts.business %}
+      <p><strong>Accepted by: {{ posts.business.name }}</strong></p>
+    {% endif %}
   </div>
-  <div class="card-action">
-      <a href="{% url 'posts_update' posts.id %}">Edit</a>
-      <a href="{% url 'posts_delete' posts.id %}">Delete</a>
-  </div>
+  {% if posts.user == user and user.profile.role == 'client' %}
+    <div class="card-action">
+        <a href="{% url 'posts_update' posts.id %}">Edit</a>
+        <a href="{% url 'posts_delete' posts.id %}">Delete</a>
+    </div>
+  {% elif user.profile.role == 'business_owner' and not posts.business %}
+    <div class="card-action">
+        <a href="{% url 'post_accept' posts.id %}">Accept</a>
+    </div>
+  {% endif %}
 </div>
 
 {% endblock %}
