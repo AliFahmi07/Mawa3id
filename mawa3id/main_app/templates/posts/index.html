@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% if user.profile.role == 'client' %}
 <a href="{% url 'posts_create' %}">Add new Post</a>
+{% endif %}
 
 {% for post in posts %}
   <div class="card">
@@ -13,10 +15,12 @@
       <hr>
     </div>
     </a>
+    {% if user.profile.role == 'business_owner' %}
+      <div class="card-action">
+        <a href="{% url 'post_accept' post.id %}">Accept</a>
+      </div>
+    {% endif %}
   </div>
-
-  {% comment %} <a href="{% url 'posts_create' %}">Add new Post</a> {% endcomment %}
-
 {% endfor %}
 
 

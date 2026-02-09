@@ -50,14 +50,11 @@ def signup(request):
     )
 
 def posts_index(request):
-    # Check user's role through their profile
     user_profile = request.user.profile
     
     if user_profile.role == Profile.Role.CLIENT:
-        # Clients see only their own posts
         posts = Posts.objects.filter(user=request.user)
-    else:  # Business owner
-        # Business owners see all posts by other users (potential job requests)
+    else:
         posts = Posts.objects.exclude(user=request.user)
     
     return render(request, 'posts/index.html', {'posts': posts})
@@ -169,6 +166,11 @@ class PostDelete(DeleteView):
     model = Posts
     template_name = 'posts/posts_confirm_delete.html'
     success_url = '/posts/'
+
+def post_accept(request, posts_id):
+    post = Posts.objects.get(id=posts_id)
+    return render(request, 'posts/post_accepted.html', {'post': post})
+
 class BusinessUpdate(UpdateView):
     model = Business
     fields = ["name", "description", "category"]

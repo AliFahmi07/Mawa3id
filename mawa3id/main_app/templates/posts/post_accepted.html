@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+  <div class="card-content">
+    <h2>Job Accepted</h2>
+    <p>You accepted the post from <strong>{{ post.user }}</strong>.</p>
+    <p><strong>Description:</strong> {{ post.description }}</p>
+    <p><strong>Price:</strong> ${{ post.price }}</p>
+  </div>
+  <div class="card-action">
+    <a href="{% url 'posts_index' %}">Back to Posts</a>
+  </div>
+</div>
+{% endblock %}

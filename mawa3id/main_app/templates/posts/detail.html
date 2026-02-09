@@ -7,10 +7,16 @@
     <p>Description: {{ posts.description }}</p>
     <p>Price: ${{ posts.price }}</p>
   </div>
-  <div class="card-action">
-      <a href="{% url 'posts_update' posts.id %}">Edit</a>
-      <a href="{% url 'posts_delete' posts.id %}">Delete</a>
-  </div>
+  {% if posts.user == user and user.profile.role == 'client' %}
+    <div class="card-action">
+        <a href="{% url 'posts_update' posts.id %}">Edit</a>
+        <a href="{% url 'posts_delete' posts.id %}">Delete</a>
+    </div>
+  {% elif user.profile.role == 'business_owner' %}
+    <div class="card-action">
+        <a href="{% url 'post_accept' posts.id %}">Accept</a>
+    </div>
+  {% endif %}
 </div>
 
 {% endblock %}
