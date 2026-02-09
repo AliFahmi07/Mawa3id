@@ -13,8 +13,6 @@ from .models import Business, Profile, Service, Review, TimeSlot, Booking
 from django.urls import reverse
 from django.views import View
 from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm
-from django.contrib.auth.mixins import LoginRequiredMixin
-from .google_calendar import create_event_for_booking, update_event_for_booking, delete_event_for_booking
 
 # Create your views here.
 
@@ -22,7 +20,8 @@ from .google_calendar import create_event_for_booking, update_event_for_booking,
 #Registration
 
 def home(request):
-    return render(request, "home.html")
+    businesses = Business.objects.all().order_by("category", "name")
+    return render(request, "home.html", {"businesses": businesses})
 
 def signup(request):
     error_message = ""
@@ -50,14 +49,11 @@ def signup(request):
     )
 
 def posts_index(request):
-    # Check user's role through their profile
     user_profile = request.user.profile
 
     if user_profile.role == Profile.Role.CLIENT:
-        # Clients see only their own posts
         posts = Posts.objects.filter(user=request.user)
-    else:  # Business owner
-        # Business owners see all posts by other users (potential job requests)
+    else:
         posts = Posts.objects.exclude(user=request.user)
 
     return render(request, 'posts/index.html', {'posts': posts})
@@ -165,10 +161,38 @@ class PostUpdate(UpdateView):
     template_name = 'posts/posts_form.html'
     success_url = '/posts/'
 
+    def get_queryset(self):
+        return Posts.objects.filter(user=self.request.user)
+
 class PostDelete(DeleteView):
     model = Posts
     template_name = 'posts/posts_confirm_delete.html'
     success_url = '/posts/'
+
+    def get_queryset(self):
+        return Posts.objects.filter(user=self.request.user)
+
+def post_accept(request, posts_id):
+    post = Posts.objects.get(id=posts_id)
+    
+    if request.user.profile.role != 'business_owner':
+        return redirect('posts_index')
+    
+    if post.user == request.user:
+        return redirect('posts_index')
+    
+    if post.business:
+        return redirect('posts_index')
+    
+    if not Business.objects.filter(owner=request.user).exists():
+        return redirect('business_create')
+    
+    business = Business.objects.get(owner=request.user)
+    post.business = business
+    post.save()
+    
+    return render(request, 'posts/post_accepted.html', {'post': post})
+
 class BusinessUpdate(UpdateView):
     model = Business
     fields = ["name", "description", "category"]

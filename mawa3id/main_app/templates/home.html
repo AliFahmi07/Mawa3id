@@ -2,10 +2,18 @@
 {%block content%}
 <h1>Home</h1>
 
+{% if user.is_authenticated %}
+  <h2>All Businesses</h2>
+  {% load static %}
 
-<ul>
+  <div class="business-container">
   {% for buiz in businesses %}
     <li>{{buiz.name}}
   {% endfor %}
-</ul>
+</div>
+
+{% else %}
+  <h2>Welcome to Mawa3id</h2>
+{% endif %}
+
 {%endblock%}
