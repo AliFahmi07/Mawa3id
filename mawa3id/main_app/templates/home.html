@@ -1,11 +1,11 @@
 {%extends 'base.html'%}
 {%block content%}
-<p>Hello</p>
+<h2>All Businesses</h2>
 
-
-<ul>
-  {% for buiz in businesses %}
-    <li>{{buiz.name}}
-  {% endfor %}
-</ul>
+{% for buiz in businesses %}
+  <div>
+    <a href="{% url 'business_detail' pk=buiz.id %}"  >{{ buiz.name }}</a>
+    <span>({{ buiz.category }})</span>
+  </div>
+{% endfor %}
 {%endblock%}

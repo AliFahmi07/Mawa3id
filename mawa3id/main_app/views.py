@@ -13,8 +13,6 @@ from .models import Business, Profile, Service, Review, TimeSlot, Booking
 from django.urls import reverse
 from django.views import View
 from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm
-from django.contrib.auth.mixins import LoginRequiredMixin
-from .google_calendar import create_event_for_booking, update_event_for_booking, delete_event_for_booking
 
 # Create your views here.
 
@@ -22,7 +20,8 @@ from .google_calendar import create_event_for_booking, update_event_for_booking,
 #Registration
 
 def home(request):
-    return render(request, "home.html")
+    businesses = Business.objects.all().order_by("category", "name")
+    return render(request, "home.html", {"businesses": businesses})
 
 def signup(request):
     error_message = ""
