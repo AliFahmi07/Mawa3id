@@ -21,6 +21,7 @@
 
     <li><a href="{% url 'home' %}">Home</a></li>
     <li><a href="{% url 'profile_detail' %}">My Profile</a></li>
+    <li><a href="{% url 'posts_index' %}">Posts</a></li>
 
     {% with mybiz=user.businesses.first %}
       {% if mybiz %}

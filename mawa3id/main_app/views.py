@@ -50,7 +50,16 @@ def signup(request):
     )
 
 def posts_index(request):
-    posts = Posts.objects.filter(user=request.user)
+    # Check user's role through their profile
+    user_profile = request.user.profile
+    
+    if user_profile.role == Profile.Role.CLIENT:
+        # Clients see only their own posts
+        posts = Posts.objects.filter(user=request.user)
+    else:  # Business owner
+        # Business owners see all posts by other users (potential job requests)
+        posts = Posts.objects.exclude(user=request.user)
+    
     return render(request, 'posts/index.html', {'posts': posts})
 
 def posts_detail(request, posts_id):
