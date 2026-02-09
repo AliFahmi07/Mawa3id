@@ -51,10 +51,10 @@ def signup(request):
 
 def posts_index(request):
     posts = Posts.objects.filter(user=request.user)
-    return render(request, 'posts/index.html')
+    return render(request, 'posts/index.html', {'posts': posts})
 
 def posts_detail(request, posts_id):
-    posts = Posts.objects.get(posts=posts_id)
+    posts = Posts.objects.get(id=posts_id)
     return render(request, 'posts/detail.html', {'posts': posts})
 
 
@@ -143,10 +143,12 @@ class PostCreate(CreateView):
     model = Posts
     fields = ['description', 'price']
     template_name = 'posts/posts_form.html'
-
+    success_url = '/posts/'
+    
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
+    
 
 class PostUpdate(UpdateView):
     model = Posts
