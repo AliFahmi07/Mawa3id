@@ -152,7 +152,9 @@ class PostCreate(CreateView):
 
 class PostUpdate(UpdateView):
     model = Posts
-    fields = ['description']
+    fields = ['description', 'price']
+    template_name = 'posts/posts_form.html'
+    success_url = '/posts/'
 
 class PostDelete(DeleteView):
     model = Posts
