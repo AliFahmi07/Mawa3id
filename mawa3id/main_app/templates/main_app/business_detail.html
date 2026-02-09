@@ -32,7 +32,7 @@
         <p>{{ service.description }}</p>
         <p>Price: ${{ service.price }}</p>
         <p>Duration: {{ service.time }} mins</p>
-
+        <hr>
         <h4>Reviews ({{ service.reviews.count }})</h4>
 
         {% if service.reviews.count %}
