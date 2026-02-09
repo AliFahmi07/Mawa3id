@@ -50,11 +50,20 @@ def signup(request):
     )
 
 def posts_index(request):
-    posts = Posts.objects.filter(user=request.user)
-    return render(request, 'posts/index.html')
+    # Check user's role through their profile
+    user_profile = request.user.profile
+    
+    if user_profile.role == Profile.Role.CLIENT:
+        # Clients see only their own posts
+        posts = Posts.objects.filter(user=request.user)
+    else:  # Business owner
+        # Business owners see all posts by other users (potential job requests)
+        posts = Posts.objects.exclude(user=request.user)
+    
+    return render(request, 'posts/index.html', {'posts': posts})
 
 def posts_detail(request, posts_id):
-    posts = Posts.objects.get(posts=posts_id)
+    posts = Posts.objects.get(id=posts_id)
     return render(request, 'posts/detail.html', {'posts': posts})
 
 
@@ -143,20 +152,23 @@ class PostCreate(CreateView):
     model = Posts
     fields = ['description', 'price']
     template_name = 'posts/posts_form.html'
-
+    success_url = '/posts/'
+    
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
+    
 
 class PostUpdate(UpdateView):
     model = Posts
-    fields = ['description']
+    fields = ['description', 'price']
+    template_name = 'posts/posts_form.html'
+    success_url = '/posts/'
 
 class PostDelete(DeleteView):
     model = Posts
+    template_name = 'posts/posts_confirm_delete.html'
     success_url = '/posts/'
-
-
 class BusinessUpdate(UpdateView):
     model = Business
     fields = ["name", "description", "category"]
