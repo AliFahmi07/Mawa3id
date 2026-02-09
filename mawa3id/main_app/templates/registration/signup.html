@@ -1,15 +1,32 @@
+{%extends "base.html"%}
 {% block content %}
-<h1>Sign Up</h1>
-{% if error_message %}
-  <p>
-  {{ error_message }}
-</p>{% endif %}
-<form method="post" action="{% url 'signup' %}" enctype="multipart/form-data">
-  {% csrf_token %}
-  <h2>User</h2>
-  {{ user_form.as_p }}
-  <h2>Profile</h2>
-  {{ profile_form.as_p }}
-  <input type="submit" class="btn" value="Sign Up">
-</form>
+<div class="signup-container">
+  <div class="signup-card">
+
+    <h1 class="signup-title">Create Account</h1>
+
+    {% if error_message %}
+      <p class="error-message">{{ error_message }}</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'signup' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <h2 class="section-title">User Info</h2>
+      <div class="form-section">
+        {{ user_form.as_p }}
+      </div>
+
+      <h2 class="section-title">Profile Info</h2>
+      <div class="form-section">
+        {{ profile_form.as_p }}
+      </div>
+
+      <input type="submit" class="btn signup-btn" value="Sign Up">
+
+    </form>
+
+  </div>
+</div>
+
 {% endblock %}

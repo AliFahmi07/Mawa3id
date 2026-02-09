@@ -21,16 +21,23 @@
 
     <li><a href="{% url 'home' %}">Home</a></li>
     <li><a href="{% url 'profile_detail' %}">My Profile</a></li>
-    <li><a href="{% url 'posts_index' %}">Posts</a></li>
 
-    {% with mybiz=user.businesses.first %}
-      {% if mybiz %}
-        <li><a href="{% url 'business_detail' pk=mybiz.id %}">Business</a></li>
-        <li><a href="{% url 'timeslot_list' pk=mybiz.id %}">Slots</a></li>
-      {% else %}
-        <li><a href="{% url 'business_create' %}">Create Business</a></li>
-      {% endif %}
-    {% endwith %}
+    {% if user_role %}
+    <li><a href="{% url 'posts_create' %}">Create Post</a></li>
+    {% else %}
+      <li><a href="{% url 'posts_index' %}">Posts</a></li>
+      {% with mybiz=user.businesses.first %}
+        {% if mybiz %}
+          <li><a href="{% url 'business_detail' pk=mybiz.id %}">Business</a></li>
+          <li><a href="{% url 'timeslot_list' pk=mybiz.id %}">Slots</a></li>
+        {% else %}
+          <li><a href="{% url 'business_create' %}">Create Business</a></li>
+        {% endif %}
+      {% endwith %}
+    {% endif %}
+
+
+
 
   {% else %}
     <li><a href="{% url 'login' %}">Login</a></li>

@@ -43,7 +43,7 @@ def signup(request):
     user_form = UserCreationForm
     profile_form = ProfileCreateForm
 
-    context = {"user_form": user_form, "profile_form": profile_form ,"error_message": error_message}
+    context = {"user_form": user_form, "profile_form": profile_form, "error_message": error_message}
     return render(
         request,
         "registration/signup.html", context
