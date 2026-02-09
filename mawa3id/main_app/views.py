@@ -357,6 +357,10 @@ def add_review(request, service_id):
     """Add a review to a service - prevents duplicates"""
     service = get_object_or_404(Service, id=service_id)
 
+    # Only clients can write reviews
+    if request.user.profile.role != Profile.Role.CLIENT:
+        return redirect('home')
+
     # Check if user already reviewed this service
     if Review.objects.filter(service=service, user=request.user).exists():
         return redirect('home')
