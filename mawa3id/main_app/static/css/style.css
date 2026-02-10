@@ -412,3 +412,34 @@
     font-size: 18px;
     padding: 40px;
   }
+
+  /* Delete Confirmation */
+  .delete-warning {
+    background: #fee2e2;
+    border-left: 4px solid #dc2626;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+
+  .delete-warning p {
+    margin: 0;
+    color: #111827;
+    font-size: 15px;
+  }
+
+  .warning-text {
+    margin-top: 8px !important;
+    font-size: 13px !important;
+    color: #dc2626 !important;
+    font-weight: 600;
+  }
+
+  .danger-btn {
+    background: #dc2626;
+    color: white;
+  }
+
+  .danger-btn:hover {
+    background: #b91c1c;
+  }
