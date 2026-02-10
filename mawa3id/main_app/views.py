@@ -483,6 +483,9 @@ class BookingUpdate(UpdateView):
     fields = ["status"]
     template_name="main_app/booking_form.html"
 
+    def get_queryset(self):
+        return Booking.objects.filter(client=self.request.user)
+
     def form_valid(self, form):
 
         response = super().form_valid(form)
@@ -495,11 +498,35 @@ class BookingUpdate(UpdateView):
         return response
 
     def get_success_url(self):
-        return reverse("business_dashboard")
+            return reverse("timeslot_list", kwargs={"pk": self.object.slot.business_id})
+
+
+class BookingStatusUpdate(UpdateView):
+        model = Booking
+        fields = ['status']
+
+        def get_queryset(self):
+            return Booking.objects.filter(slot__business__owner=self.request.user)
+
+        def form_valid(self, form):
+            response = super().form_valid(form)
+
+            try:
+                update_event_for_booking(self.object)
+            except Exception:
+                pass
+
+            return response
+
+        def get_success_url(self):
+            return reverse("business_dashboard")
 
 
 class BookingDelete(DeleteView):
     model = Booking
+
+    def get_queryset(self):
+        return Booking.objects.filter(client=self.request.user)
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
