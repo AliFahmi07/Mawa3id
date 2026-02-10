@@ -27,8 +27,11 @@ import calendar
 
 def home(request):
     businesses = Business.objects.all().order_by("category", "name")
-    if request.user.is_authenticated:
-        print(Profile.objects.get(user=request.user).role)
+    
+    # Don't show buzznes to business owners
+    if request.user.is_authenticated and request.user.profile.role == Profile.Role.BUSINESS_OWNER:
+        businesses = Business.objects.none()
+    
     return render(request, "home.html", {"businesses": businesses})
 
 def signup(request):
