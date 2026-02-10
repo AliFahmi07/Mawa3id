@@ -8,7 +8,7 @@
 
   <div class="business-container">
   {% for buiz in businesses %}
-    <li>{{buiz.name}}
+    <li><a href="{% url 'business_detail' pk=buiz.id %}">{{buiz.name}}</a></li>
   {% endfor %}
 </div>
 

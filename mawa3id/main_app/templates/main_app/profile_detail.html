@@ -12,4 +12,20 @@
       <img src="{% static profile.image|cut:'main_app/static/' %}" alt="no photo" />
     </div>
   </div>
+
+  {% if profile.role == 'business_owner' %}
+    <h2>Business Dashboard</h2>
+    
+    <h3>  Average Rating: {{ average_rating }}/5  </h3>
+    
+    <h3>All Reviews</h3>
+    {% for review in all_reviews %}
+      <div>
+        <p>{{ review.user.username }} - {{ review.rating }}/5  </p>
+        <p>{{ review.text }}</p>
+        <p>Service: {{ review.service.name  }}</p>
+        <hr>
+      </div>
+    {% endfor %}
+  {% endif %}
 {% endblock content %}

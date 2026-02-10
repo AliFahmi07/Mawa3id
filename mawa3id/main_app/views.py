@@ -21,7 +21,8 @@ from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlo
 
 def home(request):
     businesses = Business.objects.all().order_by("category", "name")
-    print(Profile.objects.get(user=request.user).role)
+    if request.user.is_authenticated:
+        print(Profile.objects.get(user=request.user).role)
     return render(request, "home.html", {"businesses": businesses})
 
 def signup(request):
@@ -90,6 +91,27 @@ class ProfileDetail(DetailView):
     model = Profile
     def get_object(self):
         return Profile.objects.get(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        profile = self.get_object()
+        
+        if profile.role == Profile.Role.BUSINESS_OWNER:
+            business = Business.objects.filter(owner=self.request.user).first()
+            if business:
+                all_reviews = Review.objects.filter(service__business=business)
+                context['all_reviews'] = all_reviews
+                
+                if all_reviews.exists():
+                    total_rating = 0
+                    for review in all_reviews:
+                        total_rating += review.rating
+                    avg_rating = total_rating / all_reviews.count()
+                    context['average_rating']= round(avg_rating, 1)
+                else:
+                    context['average_rating']=  0
+                    
+        return context
 
 
 
