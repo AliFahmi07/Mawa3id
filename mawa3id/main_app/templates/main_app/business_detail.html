@@ -11,7 +11,7 @@
           <span class="detail-category">{{ business.category }}</span>
           <p class="detail-description">{{ business.description }}</p>
         </div>
-        
+
         {% if user == business.owner %}
         <div class="detail-actions">
           <a href="{% url 'business_update' business.id %}" class="btn-edit">Edit Business</a>
