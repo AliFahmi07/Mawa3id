@@ -1,24 +1,27 @@
 {% extends "base.html" %}
 
 {% block content %}
-      <li>
-      <a href="{% url 'timeslot_create' pk=object.id %}">Add slot</a>
-      </li>
+    <li>
+        <a href="{% url 'timeslot_create' pk=object.id %}">Add slot</a>
+    </li>
 
 {% if object %}
 <h1>Business</h1>
-  <div>
+<div>
     <div>
-      <span>{{ business.name }}</span>
-      <span>{{ business.category }}</span>
-      <span>{{ business.description }}</span>
-      {% if user == business.owner %}
-      <div>
-        <a href="{% url 'business_update' business.id %}">Edit</a>
-      </div>
-      {% endif %}
+        <span>name:{{ business.name }}</span><br>
+        <span>category:{{ business.category }}</span><br>
+        <span>description:{{ business.description }}</span>
+        {% if user == business.owner %}
+        <div>
+            <a href="{% url 'business_update' business.id %}">Edit</a>
+            <a href={% url "service_create" pk=business.id %}>
+                add service
+            </a>
+        </div>
+        {% endif %}
     </div>
-  </div>
+</div>
 
 <hr>
 
@@ -32,6 +35,7 @@
         <p>{{ service.description }}</p>
         <p>Price: ${{ service.price }}</p>
         <p>Duration: {{ service.time }} mins</p>
+        <a href={% url "service_update" pk=business.id service_id=service.id%}>Edit Service</a>
         <hr>
         <h4>Reviews ({{ service.reviews.count }})</h4>
 
@@ -89,7 +93,7 @@
 {% endfor %}
 
 {% if not business.services.count %}
-<p>No services available yet</p>
+    <p>No services available yet</p>
 {% endif %}
 
 {% else %}
