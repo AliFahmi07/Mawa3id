@@ -518,17 +518,14 @@ class TimeSlotCreate(CreateView):
     model = TimeSlot
     form_class = TimeSlotForm
 
-    def get_form(self, form_class=None):
-        """
-        Filter the 'service' dropdown to only show services
-        associated with the current business.
-        """
+    def get_form(self, form_class=None):  #Filter the 'service' dropdown to only show services associated with the current business.
         form = super().get_form(form_class)
         business_id = self.kwargs.get('pk')
-
         # Filter the service field's queryset
-        form.fields['service'].queryset = Service.objects.filter(business_id=business_id)
-
+        if business_id:
+            form.fields["service"].queryset = Service.objects.filter(business_id=business_id)
+        else:
+            form.fields["service"].queryset = Service.objects.none()
         return form
 
     def form_valid(self, form):
