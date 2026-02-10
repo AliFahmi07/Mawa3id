@@ -1336,7 +1336,8 @@
     padding: 20px;
   }
 
-  .form-page-card {
+  .form-page-card,
+  .confirm-delete-card {
     background: white;
     border-radius: 12px;
     padding: 40px;
@@ -1349,14 +1350,6 @@
     margin-bottom: 30px;
     padding-bottom: 15px;
     border-bottom: 3px solid #2563eb;
-  }
-
-  /* Confirm Delete Styles */
-  .confirm-delete-card {
-    background: white;
-    border-radius: 12px;
-    padding: 40px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 
   .confirm-delete-title {
@@ -1377,7 +1370,6 @@
 
   .warning-text {
     color: #991b1b;
-    font-size: 16px;
     font-weight: 600;
     margin: 0;
   }
@@ -1411,24 +1403,14 @@
 
   .detail-value {
     color: #111827;
-    flex: 1;
   }
 
-  /* Button Variants */
-  .btn-danger {
+  .form-actions .btn-danger {
     background: #dc2626;
-    color: white;
-    padding: 14px 28px;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
   }
 
-  .btn-danger:hover {
+  .form-actions .btn-danger:hover {
     background: #b91c1c;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
