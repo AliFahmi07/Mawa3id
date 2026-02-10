@@ -7,10 +7,6 @@
   {% if request.user == business.owner %}
     <a href="{% url 'timeslot_create' pk=business.id %}">+ Add Slot</a>
   {% endif %}
-  |
-  <a href="{% url 'business_detail' pk=business.id %}">Back to Business</a>
-  |
-  <a href="{% url 'business_dashboard' %}">Business Dashboard</a>
 </p>
 
 {% if slots %}
@@ -46,7 +42,7 @@
           <a href="{% url 'timeslot_delete' pk=slot.id %}">Delete Slot</a>
 
           {% if slot.booking %}
-            
+
           {% else %}
             {% if slot.is_active and slot.start > now %}
               |

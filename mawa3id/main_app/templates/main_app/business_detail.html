@@ -9,12 +9,6 @@
         <span>category:{{ business.category }}</span><br>
         <span>description:{{ business.description }}</span>
         {% if user == business.owner %}
-        <div>
-            <a href="{% url 'business_update' business.id %}">Edit</a>
-            <a href={% url "service_create" pk=business.id %}>
-                add service
-            </a>
-        </div>
         {% endif %}
     </div>
 </div>
