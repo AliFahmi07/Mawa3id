@@ -30,7 +30,6 @@
         {% if mybiz %}
           <li><a href="{% url 'business_detail' pk=mybiz.id %}">Business</a></li>
           <li><a href="{% url 'timeslot_list' pk=mybiz.id %}">Slots</a></li>
-          <li><a href="{% url 'business_dashboard' %}">Dashboard</a></li>
         {% else %}
           <li><a href="{% url 'business_create' %}">Create Business</a></li>
         {% endif %}
