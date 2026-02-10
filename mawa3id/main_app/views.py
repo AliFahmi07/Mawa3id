@@ -15,14 +15,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Business, Profile, Service, Review, TimeSlot, Booking
 from django.urls import reverse
 from django.views import View
-<<<<<<< HEAD
 from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm, BusinessEditForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .google_calendar import create_event_for_booking, update_event_for_booking, delete_event_for_booking
 import calendar
-=======
-from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm
->>>>>>> 5555d6ab66ccf0e84e40e1cd4a3678a7be98095f
 
 # Create your views here.
 
@@ -31,8 +27,11 @@ from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlo
 
 def home(request):
     businesses = Business.objects.all().order_by("category", "name")
-    if request.user.is_authenticated:
-        print(Profile.objects.get(user=request.user).role)
+    
+    # Don't show buzznes to business owners
+    if request.user.is_authenticated and request.user.profile.role == Profile.Role.BUSINESS_OWNER:
+        businesses = Business.objects.none()
+    
     return render(request, "home.html", {"businesses": businesses})
 
 def signup(request):
