@@ -498,7 +498,6 @@ class BookingUpdate(UpdateView):
 class BookingStatusUpdate(UpdateView):
         model = Booking
         fields = ['status']
-        http_method_names = ['post']
 
         def get_queryset(self):
             return Booking.objects.filter(slot__business__owner=self.request.user)
