@@ -1,16 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
 {% block content %}
-<h1>Log In</h1>
-<form method="post" action="{% url 'login' %}">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <input type="submit" class="btn" value="login">
-</form>
+<div class="auth-container">
 
-<hr>
+  <div class="auth-card">
+    <h1 class="auth-title">Log In</h1>
 
-<form action="/google/google/login/" method="post">
-  {%csrf_token%}
-  <button type="submit">Continue with Google</button>
-</form>
+    <form method="post" action="{% url 'login' %}" class="auth-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input type="submit" class="btn primary-btn" value="Login">
+    </form>
 
+    <div class="divider">
+      <span>OR</span>
+    </div>
+
+    <form action="/google/google/login/" method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn google-btn">
+        Continue with Google
+      </button>
+    </form>
+
+  </div>
+
+</div>
 {% endblock %}

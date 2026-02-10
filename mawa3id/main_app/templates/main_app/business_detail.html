@@ -1,38 +1,42 @@
 {% extends "base.html" %}
 
 {% block content %}
-      <li>
-      <a href="{% url 'timeslot_create' pk=object.id %}">Add slot</a>
-      </li>
+    <li>
+        <a href="{% url 'timeslot_create' pk=object.id %}">Add slot</a>
+    </li>
 
 {% if object %}
 <h1>Business</h1>
-  <div>
+<div>
     <div>
-      <span>{{ business.name }}</span>
-      <span>{{ business.category }}</span>
-      <span>{{ business.description }}</span>
-      {% if user == business.owner %}
-      <div>
-        <a href="{% url 'business_update' business.id %}">Edit</a>
-      </div>
-      {% endif %}
+        <span>name:{{ business.name }}</span><br>
+        <span>category:{{ business.category }}</span><br>
+        <span>description:{{ business.description }}</span>
+        {% if user == business.owner %}
+        <div>
+            <a href="{% url 'business_update' business.id %}">Edit</a>
+            <a href={% url "service_create" pk=business.id %}>
+                add service
+            </a>
+        </div>
+        {% endif %}
     </div>
-  </div>
+</div>
 
 <hr>
 
 <!-- Services and Reviews Section -->
 <h2>Services</h2>
 
-{% for service in business.services.all %}
+{% for service in services %}
 <div class="card">
     <div class="card-content">
         <h3>{{ service.name }}</h3>
         <p>{{ service.description }}</p>
         <p>Price: ${{ service.price }}</p>
         <p>Duration: {{ service.time }} mins</p>
-
+        <a href={% url "service_update" pk=business.id service_id=service.id%}>Edit Service</a>
+        <hr>
         <h4>Reviews ({{ service.reviews.count }})</h4>
 
         {% if service.reviews.count %}
@@ -59,37 +63,18 @@
             <p>No reviews yet. Be the first!</p>
         {% endif %}
 
+        <hr>
         {% if user.is_authenticated and user.profile.role == 'client' %}
-        <div class="add-review">
-            <h5>Write a Review</h5>
-            <form action="{% url 'add_review' service.id %}" method="post">
-                {% csrf_token %}
-
-                <label for="rating">Rating:</label>
-                <select name="rating" required>
-                    <option value="">Select Rating</option>
-                    <option value="5">(5)</option>
-                    <option value="4">(4)</option>
-                    <option value="3">(3)</option>
-                    <option value="2">(2)</option>
-                    <option value="1">(1)</option>
-                </select>
-
-                <label for="text">Your Review:</label>
-                <textarea name="text" placeholder="Write your review..." maxlength="500" rows="3" required></textarea>
-
-                <button type="submit" class="btn">Submit Review</button>
-            </form>
-        </div>
-        {% elif not user.is_authenticated %}
-        <p><a href="{% url 'login' %}">Login</a> to write a review</p>
+            {% if not service.user_review %}
+                <a href="{% url 'review_create' service.id %}" class="btn">Write a Review</a>
+            {% endif %}
         {% endif %}
     </div>
 </div>
 {% endfor %}
 
 {% if not business.services.count %}
-<p>No services available yet</p>
+    <p>No services available yet</p>
 {% endif %}
 
 {% else %}

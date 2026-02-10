@@ -22,7 +22,7 @@
     <li><a href="{% url 'home' %}">Home</a></li>
     <li><a href="{% url 'profile_detail' %}">My Profile</a></li>
 
-    {% if user_role == "client" %}
+    {% if user_role %}
     <li><a href="{% url 'posts_create' %}">Create Post</a></li>
     {% else %}
       <li><a href="{% url 'posts_index' %}">Posts</a></li>

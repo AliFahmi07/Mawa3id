@@ -15,10 +15,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Business, Profile, Service, Review, TimeSlot, Booking
 from django.urls import reverse
 from django.views import View
+<<<<<<< HEAD
 from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm, BusinessEditForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .google_calendar import create_event_for_booking, update_event_for_booking, delete_event_for_booking
 import calendar
+=======
+from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm
+>>>>>>> 5555d6ab66ccf0e84e40e1cd4a3678a7be98095f
 
 # Create your views here.
 
@@ -26,7 +30,10 @@ import calendar
 #Registration
 
 def home(request):
-    return render(request, "home.html")
+    businesses = Business.objects.all().order_by("category", "name")
+    if request.user.is_authenticated:
+        print(Profile.objects.get(user=request.user).role)
+    return render(request, "home.html", {"businesses": businesses})
 
 def signup(request):
     error_message = ""
@@ -40,28 +47,33 @@ def signup(request):
             profile.user = user
             profile.save()
             login(request, user, backend=settings.AUTHENTICATION_BACKENDS[0],)
-            return redirect("/profile")
+
+            # Redirect based on role
+            if profile.role == "business_owner":
+                return redirect("business_create")
+            else:
+                return redirect("home")  # default fallback
+
+
+
         else:
             error_message = "Invalid signup - try again"
 
-    user_form = UserCreationForm
-    profile_form = ProfileCreateForm
+    user_form = UserCreationForm()
+    profile_form = ProfileCreateForm()
 
-    context = {"user_form": user_form, "profile_form": profile_form ,"error_message": error_message}
+    context = {"user_form": user_form, "profile_form": profile_form, "error_message": error_message}
     return render(
         request,
         "registration/signup.html", context
     )
 
 def posts_index(request):
-    # Check user's role through their profile
     user_profile = request.user.profile
 
     if user_profile.role == Profile.Role.CLIENT:
-        # Clients see only their own posts
         posts = Posts.objects.filter(user=request.user)
-    else:  # Business owner
-        # Business owners see all posts by other users (potential job requests)
+    else:
         posts = Posts.objects.exclude(user=request.user)
 
     return render(request, 'posts/index.html', {'posts': posts})
@@ -89,6 +101,27 @@ class ProfileDetail(DetailView):
     model = Profile
     def get_object(self):
         return Profile.objects.get(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        profile = self.get_object()
+        
+        if profile.role == Profile.Role.BUSINESS_OWNER:
+            business = Business.objects.filter(owner=self.request.user).first()
+            if business:
+                all_reviews = Review.objects.filter(service__business=business)
+                context['all_reviews'] = all_reviews
+                
+                if all_reviews.exists():
+                    total_rating = 0
+                    for review in all_reviews:
+                        total_rating += review.rating
+                    avg_rating = total_rating / all_reviews.count()
+                    context['average_rating']= round(avg_rating, 1)
+                else:
+                    context['average_rating']=  0
+                    
+        return context
 
 
 
@@ -149,6 +182,7 @@ class BusinessDetail(DetailView):
     def get_object(self):
         return get_object_or_404(Business, pk=self.kwargs["pk"])
 
+<<<<<<< HEAD
 # AI >>>>>>>>>>>>>>>>>>>>>>>>>
 class BusinessDashboard(LoginRequiredMixin, View):
     template_name = "main_app/business_dashboard.html"
@@ -268,6 +302,17 @@ class BusinessDashboard(LoginRequiredMixin, View):
 
     #AI <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+=======
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        services = list(self.object.services.all())
+        
+        if self.request.user.is_authenticated:
+            for service in services:
+                service.user_review = service.reviews.filter(user=self.request.user).first() 
+        context['services'] = services
+        return context
+>>>>>>> 5555d6ab66ccf0e84e40e1cd4a3678a7be98095f
 
 #===========================================================================================================
 #POSTS
@@ -289,10 +334,38 @@ class PostUpdate(UpdateView):
     template_name = 'posts/posts_form.html'
     success_url = '/posts/'
 
+    def get_queryset(self):
+        return Posts.objects.filter(user=self.request.user)
+
 class PostDelete(DeleteView):
     model = Posts
     template_name = 'posts/posts_confirm_delete.html'
     success_url = '/posts/'
+
+    def get_queryset(self):
+        return Posts.objects.filter(user=self.request.user)
+
+def post_accept(request, posts_id):
+    post = Posts.objects.get(id=posts_id)
+
+    if request.user.profile.role != 'business_owner':
+        return redirect('posts_index')
+
+    if post.user == request.user:
+        return redirect('posts_index')
+
+    if post.business:
+        return redirect('posts_index')
+
+    if not Business.objects.filter(owner=request.user).exists():
+        return redirect('business_create')
+
+    business = Business.objects.get(owner=request.user)
+    post.business = business
+    post.save()
+
+    return render(request, 'posts/post_accepted.html', {'post': post})
+
 class BusinessUpdate(UpdateView):
     model = Business
     fields = ["name", "description", "category"]
@@ -472,9 +545,13 @@ class ServiceUpdate(UpdateView):
     fields = ["name", "description", "time", "price"]
     template_name = 'main_app/service_form.html'
 
-    def get_success_url(self):
-        return reverse("service_detail", kwargs={'service_id': self.object.id, })
+    def get_object(self, queryset=None):
+        service_id = self.kwargs.get("service_id")
+        # Filter service that belongs to the business
+        return get_object_or_404(Service, id=service_id)
 
+    def get_success_url(self):
+        return reverse("business_detail", kwargs={"pk": self.kwargs.get("pk")})
 
 class ServiceDelete(DeleteView):
     model = Service
@@ -486,40 +563,35 @@ class ServiceDelete(DeleteView):
 #===========================================================================================================
 #Review
 
-@login_required
-def add_review(request, service_id):
-    """Add a review to a service - prevents duplicates"""
-    service = get_object_or_404(Service, id=service_id)
-    business_id = service.business_id
+class ReviewCreate(LoginRequiredMixin, CreateView):
+    model = Review
+    fields = ['rating', 'text']
+    template_name = 'main_app/review_form.html'
+    
+    def form_valid(self, form):
+        service = get_object_or_404(Service, id=self.kwargs['service_id'])
+        
+        if self.request.user.profile.role != Profile.Role.CLIENT:
+            return redirect("business_detail", pk=service.business_id)
+        
+        if Review.objects.filter(service=service, user=self.request.user).exists():
+            return redirect("business_detail", pk=service.business_id)
+        
+        form.instance.service = service
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
-    # Only clients can write reviews
-    if request.user.profile.role != Profile.Role.CLIENT:
-        return redirect("business_detail", pk=business_id)
-
-    # Check if user already reviewed this service
-    if Review.objects.filter(service=service, user=request.user).exists():
-        return redirect("business_detail", pk=business_id)
-
-    if request.method == 'POST':
-        rating = request.POST.get('rating')
-        text = request.POST.get('text', '').strip()
-
-        # Validate
-        if rating and text and len(text) <= 500:
-            Review.objects.create(
-                service=service,
-                user=request.user,
-                rating=int(rating),
-                text=text
-            )
-
-    return redirect("business_detail", pk=business_id)
+    def get_success_url(self):
+        return reverse("business_detail", kwargs={"pk": self.object.service.business_id})
 
 
 class ReviewUpdate(LoginRequiredMixin, UpdateView):
     model = Review
     fields = ['rating', 'text']
     template_name = 'main_app/review_form.html'
+
+    def get_queryset(self):
+        return Review.objects.filter(user=self.request.user)
 
     def get_success_url(self):
         return reverse("business_detail", kwargs={"pk": self.object.service.business_id})
@@ -528,6 +600,9 @@ class ReviewUpdate(LoginRequiredMixin, UpdateView):
 class ReviewDelete(LoginRequiredMixin, DeleteView):
     model = Review
     template_name = 'main_app/review_confirm_delete.html'
+
+    def get_queryset(self):
+        return Review.objects.filter(user=self.request.user)
 
     def get_success_url(self):
         return reverse("business_detail", kwargs={"pk": self.object.service.business_id})
