@@ -185,11 +185,28 @@ class BusinessDetail(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         services = list(self.object.services.all())
+        service_id = self.request.GET.get("service")
 
         if self.request.user.is_authenticated:
             for service in services:
                 service.user_review = service.reviews.filter(user=self.request.user).first()
+
+        slots = (
+            TimeSlot.objects
+            .filter(
+                business=self.object,
+                is_active=True,
+                start__gt=timezone.now(),
+                booking__isnull=True,
+            )
+            .select_related("service", "business")
+            .order_by("start")
+        )
+
         context['services'] = services
+        context["slots"] = slots
+        context["service_id"] = service_id
+        context["now"] = timezone.now()
         return context
 
 # AI >>>>>>>>>>>>>>>>>>>>>>>>>
@@ -505,7 +522,7 @@ class BookingCreate(LoginRequiredMixin, CreateView):
 
 
     def get_success_url(self):
-        return reverse("timeslot_list", kwargs={"pk": self.object.slot.business_id})
+            return reverse("business_detail", kwargs={"pk": self.object.slot.business_id})
 
 class BookingUpdate(LoginRequiredMixin, UpdateView):
     model = Booking
