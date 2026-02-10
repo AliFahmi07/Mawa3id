@@ -6,6 +6,14 @@
     <!-- Business Info Card -->
     <div class="detail-header-card">
       <div class="detail-header-content">
+{% if object %}
+<h1>Business</h1>
+<div>
+    <div>
+        <span>name:{{ business.name }}</span><br>
+        <span>category:{{ business.category }}</span><br>
+        <span>description:{{ business.description }}</span>
+        {% if user == business.owner %}
         <div>
           <h1 class="detail-title">{{ business.name }}</h1>
           <span class="detail-category">{{ business.category }}</span>
