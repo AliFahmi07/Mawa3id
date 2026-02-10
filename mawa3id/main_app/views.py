@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django import forms
 from django.utils import timezone
+from datetime import datetime
 from django.conf import settings
+from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
@@ -12,7 +15,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Business, Profile, Service, Review, TimeSlot, Booking
 from django.urls import reverse
 from django.views import View
+<<<<<<< HEAD
+from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm, BusinessEditForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .google_calendar import create_event_for_booking, update_event_for_booking, delete_event_for_booking
+import calendar
+=======
 from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm
+>>>>>>> 5555d6ab66ccf0e84e40e1cd4a3678a7be98095f
 
 # Create your views here.
 
@@ -135,7 +145,7 @@ class ProfileUpdateView(View):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect("/profile")  # change to your profile page
+            return redirect("/profile")
 
         return render(
             request,
@@ -172,6 +182,127 @@ class BusinessDetail(DetailView):
     def get_object(self):
         return get_object_or_404(Business, pk=self.kwargs["pk"])
 
+<<<<<<< HEAD
+# AI >>>>>>>>>>>>>>>>>>>>>>>>>
+class BusinessDashboard(LoginRequiredMixin, View):
+    template_name = "main_app/business_dashboard.html"
+
+    class BusinessEditForm(forms.ModelForm):
+        class Meta:
+            model = Business
+            fields = ["name", "description", "category"]
+
+    def _get_business(self, request):
+        return get_object_or_404(Business, owner=request.user)
+
+    def _get_year_month(self, request):
+        today = timezone.localdate()
+        year = int(request.GET.get("year", today.year))
+        month = int(request.GET.get("month", today.month))
+        month = max(1, min(12, month))
+        return year, month
+
+    def _month_grid_with_bookings(self, business, year, month):
+        first_day = timezone.datetime(year, month, 1).date()
+        weeks = calendar.monthcalendar(year, month)
+
+        month_start = timezone.make_aware(
+            timezone.datetime(year, month, 1, 0, 0, 0)
+        )
+        if month == 12:
+            next_month_start = timezone.make_aware(timezone.datetime(year + 1, 1, 1, 0, 0, 0))
+        else:
+            next_month_start = timezone.make_aware(timezone.datetime(year, month + 1, 1, 0, 0, 0))
+
+        bookings = (
+            Booking.objects
+            .filter(slot__business=business, slot__start__gte=month_start, slot__start__lt=next_month_start)
+            .select_related("slot", "client", "slot__service")
+            .order_by("slot__start")
+        )
+
+        by_day = {}
+        for b in bookings:
+            d = timezone.localtime(b.slot.start).date().day
+            by_day.setdefault(d, []).append(b)
+
+        grid = []
+        for week in weeks:
+            row = []
+            for day_num in week:
+                row.append({
+                    "day": day_num,
+                    "bookings": by_day.get(day_num, []) if day_num != 0 else [],
+                })
+            grid.append(row)
+
+        return grid
+
+    def get(self, request):
+        business = self._get_business(request)
+        year, month = self._get_year_month(request)
+
+        business_form = self.BusinessEditForm(instance=business)
+        weeks = self._month_grid_with_bookings(business, year, month)
+
+        bookings = (
+            Booking.objects
+            .filter(slot__business=business)
+            .select_related("slot", "client", "slot__service", "slot__business")
+            .order_by("-slot__start")
+        )
+
+        calendar_src = None
+
+        has_google = SocialAccount.objects.filter(
+            user=business.owner,
+            provider="google"
+        ).exists()
+
+        owner = business.owner
+        google_account = SocialAccount.objects.filter(user=owner, provider="google").first()
+
+        if google_account:
+            calendar_src = google_account.extra_data.get("email") or owner.email
+
+        context = {
+            "business": business,
+            "business_form": business_form,
+            "bookings": bookings,
+            "bookings_count": bookings.count(),
+            "year": year,
+            "month": month,
+            "weeks": weeks,
+            "calendar_src": calendar_src,
+            "calendar_tz": getattr(settings, "TIME_ZONE", "UTC"),
+            "has_google": has_google,
+        }
+
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        business = self._get_business(request)
+        year, month = self._get_year_month(request)
+
+        business_form = self.BusinessEditForm(request.POST, instance=business)
+        if business_form.is_valid():
+            business_form.save()
+            return redirect("business_dashboard")
+
+        weeks = self._month_grid_with_bookings(business, year, month)
+
+        context = {
+            "business": business,
+            "business_form": business_form,
+            "year": year,
+            "month": month,
+            "weeks": weeks,
+        }
+        return render(request, self.template_name, context)
+
+    #AI <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+=======
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         services = list(self.object.services.all())
@@ -181,6 +312,7 @@ class BusinessDetail(DetailView):
                 service.user_review = service.reviews.filter(user=self.request.user).first() 
         context['services'] = services
         return context
+>>>>>>> 5555d6ab66ccf0e84e40e1cd4a3678a7be98095f
 
 #===========================================================================================================
 #POSTS
@@ -313,6 +445,7 @@ class BookingCreate(CreateView):
         slot = self.get_slot()
         context['slot'] = slot
         context['business'] = slot.business
+        context['now'] = timezone.now()
         return context
 
 
@@ -350,25 +483,22 @@ class BookingCreate(CreateView):
 
 class BookingUpdate(UpdateView):
     model = Booking
-    fields = [""]
+    fields = ["status"]
     template_name="main_app/booking_form.html"
-
-    def get_queryset(self):
-        return Booking.objects.filter(client=self.request.user)
 
     def form_valid(self, form):
 
         response = super().form_valid(form)
 
         try:
-            create_event_for_booking(self.object)
+            update_event_for_booking(self.object)
         except Exception:
             pass
 
         return response
 
     def get_success_url(self):
-        return reverse("timeslot_list", kwargs={"pk": self.object.slot.business_id})
+        return reverse("business_dashboard")
 
 
 class BookingDelete(DeleteView):

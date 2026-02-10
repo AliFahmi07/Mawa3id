@@ -1,14 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>book form</h1>
+<h1>{% if object %}Edit Booking{% else %}Create Booking{% endif %}</h1>
 
 {% if form.non_field_errors %}
   <ul>
     {% for err in form.non_field_errors %}
-      <li style="color:red;">{{ err }}</li>
+      <li>{{ err }}</li>
     {% endfor %}
   </ul>
+{% endif %}
+
+{% if slot %}
+  <p>
+    <strong>Slot:</strong> {{ slot.start }}
+    {% if slot.service %} — {{ slot.service.name }}{% endif %}
+  </p>
 {% endif %}
 
 <form method="post">
@@ -17,11 +24,10 @@
   <button type="submit">Save</button>
 </form>
 
-<p>
-  <a href="{% url 'timeslot_list' pk=slot.business_id %}">Back to slots</a>
-</p>
+{% if business_id %}
+  <p>
+    <a href="{% url 'timeslot_list' pk=business_id %}">Back to slots</a>
+  </p>
+{% endif %}
 
 {% endblock %}
-
-
-{% comment %} Temporary html only {% endcomment %}
