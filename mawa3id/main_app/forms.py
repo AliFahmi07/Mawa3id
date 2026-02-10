@@ -7,11 +7,6 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         fields = ["username"]
 
-class BusinessEditForm(forms.ModelForm):
-        class Meta:
-            model = Business
-            fields = ["name", "description", "category"]
-
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
