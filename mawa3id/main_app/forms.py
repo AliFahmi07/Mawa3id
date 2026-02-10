@@ -5,7 +5,7 @@ from .models import Profile, TimeSlot, Business
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["username", "email"]
+        fields = ["username"]
 
 class BusinessEditForm(forms.ModelForm):
         class Meta:
