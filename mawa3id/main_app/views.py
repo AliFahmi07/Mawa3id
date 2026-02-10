@@ -15,14 +15,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Business, Profile, Service, Review, TimeSlot, Booking
 from django.urls import reverse
 from django.views import View
-<<<<<<< HEAD
 from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm, BusinessEditForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .google_calendar import create_event_for_booking, update_event_for_booking, delete_event_for_booking
 import calendar
-=======
-from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm
->>>>>>> 5555d6ab66ccf0e84e40e1cd4a3678a7be98095f
 
 # Create your views here.
 
@@ -105,13 +101,13 @@ class ProfileDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         profile = self.get_object()
-        
+
         if profile.role == Profile.Role.BUSINESS_OWNER:
             business = Business.objects.filter(owner=self.request.user).first()
             if business:
                 all_reviews = Review.objects.filter(service__business=business)
                 context['all_reviews'] = all_reviews
-                
+
                 if all_reviews.exists():
                     total_rating = 0
                     for review in all_reviews:
@@ -120,7 +116,7 @@ class ProfileDetail(DetailView):
                     context['average_rating']= round(avg_rating, 1)
                 else:
                     context['average_rating']=  0
-                    
+
         return context
 
 
@@ -182,7 +178,16 @@ class BusinessDetail(DetailView):
     def get_object(self):
         return get_object_or_404(Business, pk=self.kwargs["pk"])
 
-<<<<<<< HEAD
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        services = list(self.object.services.all())
+
+        if self.request.user.is_authenticated:
+            for service in services:
+                service.user_review = service.reviews.filter(user=self.request.user).first()
+        context['services'] = services
+        return context
+
 # AI >>>>>>>>>>>>>>>>>>>>>>>>>
 class BusinessDashboard(LoginRequiredMixin, View):
     template_name = "main_app/business_dashboard.html"
@@ -302,17 +307,6 @@ class BusinessDashboard(LoginRequiredMixin, View):
 
     #AI <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-=======
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        services = list(self.object.services.all())
-        
-        if self.request.user.is_authenticated:
-            for service in services:
-                service.user_review = service.reviews.filter(user=self.request.user).first() 
-        context['services'] = services
-        return context
->>>>>>> 5555d6ab66ccf0e84e40e1cd4a3678a7be98095f
 
 #===========================================================================================================
 #POSTS
@@ -567,16 +561,16 @@ class ReviewCreate(LoginRequiredMixin, CreateView):
     model = Review
     fields = ['rating', 'text']
     template_name = 'main_app/review_form.html'
-    
+
     def form_valid(self, form):
         service = get_object_or_404(Service, id=self.kwargs['service_id'])
-        
+
         if self.request.user.profile.role != Profile.Role.CLIENT:
             return redirect("business_detail", pk=service.business_id)
-        
+
         if Review.objects.filter(service=service, user=self.request.user).exists():
             return redirect("business_detail", pk=service.business_id)
-        
+
         form.instance.service = service
         form.instance.user = self.request.user
         return super().form_valid(form)
