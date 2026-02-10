@@ -1,6 +1,5 @@
 {%extends 'base.html'%}
 {%block content%}
-<h1>Home</h1>
 
 {% if user.is_authenticated %}
   <h2>All Businesses</h2>
@@ -8,7 +7,25 @@
 
   <div class="business-container">
   {% for buiz in businesses %}
-    <li><a href="{% url 'business_detail' pk=buiz.id %}">{{buiz.name}}</a></li>
+    <div class="business-card">
+      <hr>
+      <a href="{% url 'business_detail' pk=buiz.id %}">
+        <img src="{% static buiz.owner.profile.image|cut:'main_app/static/' %}" alt="{{ buiz.name }}">
+      </a>
+
+      <h3>
+        <a href="{% url 'business_detail' pk=buiz.id %}">
+          {{ buiz.name }}
+        </a>
+      </h3>
+
+      <p class="category">{{ buiz.category }}</p>
+
+      <p class="summary">
+        {{ buiz.description }}
+      </p>
+    </div>
+  
   {% endfor %}
 </div>
 
