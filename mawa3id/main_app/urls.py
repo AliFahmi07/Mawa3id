@@ -41,7 +41,7 @@ urlpatterns = [
     path('posts/<int:posts_id>/accept/', views.post_accept, name='post_accept'),
 
     # REVIEW
-    path('service/<int:service_id>/review/add/', views.add_review, name='add_review'),
+    path('service/<int:service_id>/review/add/', views.ReviewCreate.as_view(), name='review_create'),
     path('review/<int:pk>/update/', views.ReviewUpdate.as_view(), name='review_update'),
     path('review/<int:pk>/delete/', views.ReviewDelete.as_view(), name='review_delete'),
 ]
