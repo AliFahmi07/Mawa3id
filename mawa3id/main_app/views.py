@@ -182,127 +182,6 @@ class BusinessDetail(DetailView):
     def get_object(self):
         return get_object_or_404(Business, pk=self.kwargs["pk"])
 
-<<<<<<< HEAD
-# AI >>>>>>>>>>>>>>>>>>>>>>>>>
-class BusinessDashboard(LoginRequiredMixin, View):
-    template_name = "main_app/business_dashboard.html"
-
-    class BusinessEditForm(forms.ModelForm):
-        class Meta:
-            model = Business
-            fields = ["name", "description", "category"]
-
-    def _get_business(self, request):
-        return get_object_or_404(Business, owner=request.user)
-
-    def _get_year_month(self, request):
-        today = timezone.localdate()
-        year = int(request.GET.get("year", today.year))
-        month = int(request.GET.get("month", today.month))
-        month = max(1, min(12, month))
-        return year, month
-
-    def _month_grid_with_bookings(self, business, year, month):
-        first_day = timezone.datetime(year, month, 1).date()
-        weeks = calendar.monthcalendar(year, month)
-
-        month_start = timezone.make_aware(
-            timezone.datetime(year, month, 1, 0, 0, 0)
-        )
-        if month == 12:
-            next_month_start = timezone.make_aware(timezone.datetime(year + 1, 1, 1, 0, 0, 0))
-        else:
-            next_month_start = timezone.make_aware(timezone.datetime(year, month + 1, 1, 0, 0, 0))
-
-        bookings = (
-            Booking.objects
-            .filter(slot__business=business, slot__start__gte=month_start, slot__start__lt=next_month_start)
-            .select_related("slot", "client", "slot__service")
-            .order_by("slot__start")
-        )
-
-        by_day = {}
-        for b in bookings:
-            d = timezone.localtime(b.slot.start).date().day
-            by_day.setdefault(d, []).append(b)
-
-        grid = []
-        for week in weeks:
-            row = []
-            for day_num in week:
-                row.append({
-                    "day": day_num,
-                    "bookings": by_day.get(day_num, []) if day_num != 0 else [],
-                })
-            grid.append(row)
-
-        return grid
-
-    def get(self, request):
-        business = self._get_business(request)
-        year, month = self._get_year_month(request)
-
-        business_form = self.BusinessEditForm(instance=business)
-        weeks = self._month_grid_with_bookings(business, year, month)
-
-        bookings = (
-            Booking.objects
-            .filter(slot__business=business)
-            .select_related("slot", "client", "slot__service", "slot__business")
-            .order_by("-slot__start")
-        )
-
-        calendar_src = None
-
-        has_google = SocialAccount.objects.filter(
-            user=business.owner,
-            provider="google"
-        ).exists()
-
-        owner = business.owner
-        google_account = SocialAccount.objects.filter(user=owner, provider="google").first()
-
-        if google_account:
-            calendar_src = google_account.extra_data.get("email") or owner.email
-
-        context = {
-            "business": business,
-            "business_form": business_form,
-            "bookings": bookings,
-            "bookings_count": bookings.count(),
-            "year": year,
-            "month": month,
-            "weeks": weeks,
-            "calendar_src": calendar_src,
-            "calendar_tz": getattr(settings, "TIME_ZONE", "UTC"),
-            "has_google": has_google,
-        }
-
-        return render(request, self.template_name, context)
-
-    def post(self, request):
-        business = self._get_business(request)
-        year, month = self._get_year_month(request)
-
-        business_form = self.BusinessEditForm(request.POST, instance=business)
-        if business_form.is_valid():
-            business_form.save()
-            return redirect("business_dashboard")
-
-        weeks = self._month_grid_with_bookings(business, year, month)
-
-        context = {
-            "business": business,
-            "business_form": business_form,
-            "year": year,
-            "month": month,
-            "weeks": weeks,
-        }
-        return render(request, self.template_name, context)
-
-    #AI <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-=======
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         services = list(self.object.services.all())
@@ -312,7 +191,6 @@ class BusinessDashboard(LoginRequiredMixin, View):
                 service.user_review = service.reviews.filter(user=self.request.user).first() 
         context['services'] = services
         return context
->>>>>>> 5555d6ab66ccf0e84e40e1cd4a3678a7be98095f
 
 #===========================================================================================================
 #POSTS
