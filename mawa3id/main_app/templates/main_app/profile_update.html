@@ -1,26 +1,41 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>
-  edit
-</h1>
-  <form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
+<div class="form-container">
+  <div class="form-card">
+    <h1 class="form-title">Edit Profile</h1>
+    
+    <form method="POST" enctype="multipart/form-data" class="styled-form">
+      {% csrf_token %}
 
-    <h3>User Info</h3>
-    {{ user_form.as_p }}
+      <div class="form-section">
+        <h3 class="section-heading">User Information</h3>
+        {{ user_form.as_p }}
+      </div>
 
-    <h3>Profile Info</h3>
+      <div class="form-section">
+        <h3 class="section-heading">Profile Image</h3>
+        
+        <div class="image-upload-section">
+          <div class="current-image">
+            <label class="image-label">Current Image:</label>
+            {% load static%}
+            <img src="{% static profile_form.instance.image|cut:'main_app/static/' %}"
+              alt="Profile photo" class="preview-image" />
+          </div>
+          
+          <div class="file-input-wrapper">
+            <label for="id_image" class="file-label">Change Image</label>
+            <input type="file" name="image" accept="image/*" id="id_image" class="file-input">
+          </div>
+        </div>
+      </div>
 
-    <p>
-      <label>Current Image:</label><br>
-      {% load static%}
-        <img src="{% static profile_form.instance.image|cut:'main_app/static/' %}"
-          alt="Profile photo" width="150" height="150" />
-      <br><br>
-    Change:
-      <input type="file" name="image" accept="image/*" id="id_image">
-    </p>
-    <button type="submit">Save</button>
-  </form>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'profile_detail' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock content %}
