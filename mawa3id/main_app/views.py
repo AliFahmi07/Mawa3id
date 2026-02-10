@@ -178,8 +178,7 @@ class BusinessDetail(DetailView):
         
         if self.request.user.is_authenticated:
             for service in services:
-                service.user_review = service.reviews.filter(user=self.request.user).first()
-                
+                service.user_review = service.reviews.filter(user=self.request.user).first() 
         context['services'] = services
         return context
 
@@ -438,7 +437,7 @@ class ReviewCreate(LoginRequiredMixin, CreateView):
     model = Review
     fields = ['rating', 'text']
     template_name = 'main_app/review_form.html'
-
+    
     def form_valid(self, form):
         service = get_object_or_404(Service, id=self.kwargs['service_id'])
         
