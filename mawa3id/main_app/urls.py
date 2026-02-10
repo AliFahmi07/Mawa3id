@@ -12,6 +12,7 @@ urlpatterns = [
 
     # BUSINESS
     path('business/create/', views.BusinessCreate.as_view(), name= 'business_create'),
+    path('business/dashboard/', views.BusinessDashboard.as_view(), name= 'business_dashboard'),
     path('business/<int:pk>/', views.BusinessDetail.as_view(), name= 'business_detail'),
     path('business/<int:pk>/update', views.BusinessUpdate.as_view(), name= 'business_update'),
 
