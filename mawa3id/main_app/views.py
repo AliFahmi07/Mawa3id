@@ -698,6 +698,10 @@ class ServiceCreate(CreateView):
     def get_success_url(self):
         return reverse('business_detail', kwargs={'pk':self.object.business.id})
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['business'] = Business.objects.get(owner=self.request.user)
+        return context
 
 
 class ServiceDetail(DetailView):
@@ -719,6 +723,11 @@ class ServiceUpdate(UpdateView):
 
     def get_success_url(self):
         return reverse("business_detail", kwargs={"pk": self.kwargs.get("pk")})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['business'] = Business.objects.get(owner=self.request.user)
+        return context
 
 class ServiceDelete(DeleteView):
     model = Service
