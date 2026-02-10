@@ -443,3 +443,95 @@
   .danger-btn:hover {
     background: #b91c1c;
   }
+
+  /* Posts Detail Page */
+  .detail-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+
+  .detail-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .detail-title {
+    font-size: 28px;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+
+  .detail-author {
+    color: #6b7280;
+    font-size: 15px;
+  }
+
+  .detail-author strong {
+    color: #111827;
+  }
+
+  .detail-content {
+    margin-bottom: 30px;
+  }
+
+  .detail-section {
+    margin-bottom: 25px;
+  }
+
+  .detail-section h3 {
+    font-size: 16px;
+    color: #6b7280;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .detail-section p {
+    font-size: 16px;
+    color: #111827;
+    line-height: 1.6;
+  }
+
+  .detail-price {
+    font-size: 32px !important;
+    font-weight: bold !important;
+    color: #2563eb !important;
+  }
+
+  .accepted-info {
+    background: #dbeafe;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #2563eb;
+  }
+
+  .accepted-info h3 {
+    color: #1e40af;
+  }
+
+  .accepted-info p {
+    color: #1e40af;
+  }
+
+  .detail-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .detail-actions .btn {
+    flex: 1;
+    min-width: 120px;
+  }
