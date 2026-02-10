@@ -1,0 +1,15 @@
+{% block content %}
+<h1>Sign Up</h1>
+{% if error_message %}
+  <p>
+  {{ error_message }}
+</p>{% endif %}
+<form method="post" action="{% url 'signup' %}" enctype="multipart/form-data">
+  {% csrf_token %}
+  <h2>User</h2>
+  {{ user_form.as_p }}
+  <h2>Profile</h2>
+  {{ profile_form.as_p }}
+  <input type="submit" class="btn" value="Sign Up">
+</form>
+{% endblock %}

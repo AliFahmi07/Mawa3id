@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>
+  edit
+</h1>
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <h3>User Info</h3>
+    {{ user_form.as_p }}
+
+    <h3>Profile Info</h3>
+
+    <p>
+      <label>Current Image:</label><br>
+      {% load static%}
+        <img src="{% static profile_form.instance.image|cut:'main_app/static/' %}"
+          alt="Profile photo" width="150" height="150" />
+      <br><br>
+    Change:
+      <input type="file" name="image" accept="image/*" id="id_image">
+    </p>
+    <button type="submit">Save</button>
+  </form>
+{% endblock content %}

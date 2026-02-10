@@ -1,4 +1,19 @@
 .env
+# Python
 __pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# Django
+db.sqlite3
+media/
+static/uploads/
+
+# venv
+venv/
+.venv/
+
 migrations/
 path/

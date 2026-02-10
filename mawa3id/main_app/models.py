@@ -1,0 +1,224 @@
+from django.contrib.auth.models import User
+from django.db import models
+from django.urls import reverse
+
+
+# Create your models here.
+
+class Profile(models.Model):
+    class Role(models.TextChoices):
+        CLIENT = "client", "Client"
+        BUSINESS_OWNER = "business_owner", "Business Owner"
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="profile",
+        )
+
+    image = image = models.ImageField(
+        upload_to="main_app/static/uploads",
+        default="",
+        )
+
+    role = models.CharField(
+        max_length=50,
+        choices=Role.choices,
+        default=Role.CLIENT,
+        )
+
+    def __str__(self):
+        return f"{self.user} ({self.role})"
+
+#===========================================================================================================
+
+class Business(models.Model):
+    class Category(models.TextChoices):
+        BARBER = "barber", "Barber"
+        DENTIST = "dentist", "Dentist"
+        GYM = "gym", "Gym"
+        SALON = "salon", "Salon"
+        CLINIC = "clinic", "Clinic"
+        OTHER = "other", "Other"
+
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="businesses",
+        )
+
+    name = models.CharField(max_length=100)
+
+    description = models.TextField(max_length=500)
+
+    category = models.CharField(
+        max_length=30,
+        choices=Category.choices,
+        default=Category.OTHER,
+        )
+
+    def __str__(self):
+        return self.name
+
+#===========================================================================================================
+
+class Posts(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="posts",
+        )
+
+    business = models.ForeignKey(
+        Business,
+        on_delete=models.CASCADE,
+        related_name="posts",
+        null=True,
+        blank=True,
+        )
+
+    description = models.TextField()
+
+    price = models.FloatField()
+
+    def __str__(self):
+        return f"Job Post by {self.user.username} - ${self.price}"
+
+#===========================================================================================================
+
+class Service(models.Model):
+    business = models.ForeignKey(
+        Business,
+        on_delete=models.CASCADE,
+        related_name="services",
+        )
+
+    name = models.CharField(max_length=50)
+
+    description = models.TextField(max_length=200)
+
+    time = models.IntegerField()
+
+    price = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+
+
+#===========================================================================================================
+
+class Messages(models.Model):
+    sender = models.ForeignKey(
+        User,
+        related_name="sent_messages",
+        on_delete=models.CASCADE,
+        )
+
+    receiver = models.ForeignKey(
+        User,
+        related_name="received_messages",
+        on_delete=models.CASCADE,
+        )
+
+    content = models.TextField()
+
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.sender} -> {self.receiver}: {self.content[:20]}"
+
+#===========================================================================================================
+
+class Review(models.Model):
+    class Rating(models.IntegerChoices):
+        ONE = 1, "1 Stars"
+        TWO = 2, "2 Stars"
+        THREE = 3, "3 Stars"
+        FOUR = 4, "4 Stars"
+        FIVE = 5, "5 Stars"
+
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+        )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        )
+
+    text = models.TextField()
+
+    rating = models.IntegerField(
+        choices=Rating.choices,
+        default=Rating.FIVE,
+    )
+
+    def __str__(self):
+        return f"Review by {self.user.username} - {self.rating} stars"
+
+#===========================================================================================================
+
+class TimeSlot(models.Model):
+    business = models.ForeignKey(
+        Business,
+        on_delete=models.CASCADE,
+        related_name="slots",
+    )
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        blank = True,
+        null = True,
+        related_name="slots",
+    )
+
+    start = models.DateTimeField()
+    duration = models.PositiveIntegerField()
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.business.name} | {self.start} - {self.duration}"
+
+    @property
+    def is_booked(self):
+        return hasattr(self, "booking")
+
+
+
+class Booking(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        CONFIRMED = "confirmed", "Confirmed"
+        CANCELLED = "cancelled", "Cancelled"
+        COMPLETED = "completed", "Completed"
+
+    slot = models.OneToOneField(
+        TimeSlot,
+        on_delete=models.CASCADE,
+        related_name="booking",
+    )
+    client = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="bookings"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+
+    notes = models.TextField(blank = True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Google Calendar
+    google_event_id = models.CharField(max_length=255, blank=True, null=True)
+    google_calendar_id = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.client.username} | {self.slot.business.name} | {self.slot.start}"
