@@ -222,6 +222,18 @@
     background: #2563eb;
   }
 
+  .cancel-btn {
+    background: #6b7280;
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+  }
+
+  .cancel-btn:hover {
+    background: #4b5563;
+  }
+
   /* Google button */
   .google-btn {
     background: white;

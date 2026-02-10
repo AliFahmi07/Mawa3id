@@ -2,24 +2,22 @@
 
 {% block content %}
 
-    <div class="form-container">
+<div class="auth-container">
+    <div class="auth-card">
         {% if object %}
-            <h1>Edit Post</h1>
+            <h1 class="auth-title">Edit Post</h1>
         {% else %}
-            <h1>Create New Post</h1>
+            <h1 class="auth-title">Create New Post</h1>
         {% endif %}
 
-        <form action="" method="post" enctype="multipart/form-data">
+        <form action="" method="post" class="auth-form">
             {% csrf_token %}
-            <table>
-                {{ form.as_table }}
-            </table>
+            {{ form.as_p }}
             
-            <div class="form-actions">
-                <input type="submit" value="Submit" class="btn">
-                <a href="{% url 'posts_index' %}" class="btn cancel-btn">Cancel</a>
-            </div>
+            <input type="submit" value="Submit" class="btn primary-btn">
+            <a href="{% url 'posts_index' %}" class="btn cancel-btn">Cancel</a>
         </form>
     </div>
+</div>
 
 {% endblock %}
