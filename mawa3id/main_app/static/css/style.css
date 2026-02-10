@@ -902,3 +902,516 @@
     margin-top: 6px;
     font-style: italic;
   }
+
+  /* Business (home.html) Styles */
+  .business-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+  }
+
+  .business-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  .business-header h1 {
+    font-size: 32px;
+    color: #111827;
+  }
+
+  .business-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+  }
+
+  .business-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .business-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  }
+
+  .business-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+  }
+
+  .business-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+
+  .business-card:hover .business-image img {
+    transform: scale(1.05);
+  }
+
+  .business-info {
+    padding: 20px;
+  }
+
+  .business-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .business-info h3 {
+    font-size: 20px;
+    margin: 0;
+  }
+
+  .business-info h3 a {
+    color: #111827;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .business-info h3 a:hover {
+    color: #2563eb;
+  }
+
+  .business-category {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .business-description {
+    color: #374151;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .btn-view {
+    display: block;
+    padding: 10px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+  }
+
+  .btn-view:hover {
+    background: #1d4ed8;
+  }
+
+  .welcome-message {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .welcome-message h2 {
+    font-size: 32px;
+    color: #111827;
+    margin-bottom: 10px;
+  }
+
+  .welcome-message p {
+    font-size: 18px;
+    color: #6b7280;
+  }
+
+  /* Business Detail Page Styles */
+  .detail-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 30px 20px;
+  }
+
+  .detail-header-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .detail-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 30px;
+  }
+
+  .detail-title {
+    font-size: 32px;
+    color: #111827;
+    margin-bottom: 10px;
+  }
+
+  .detail-category {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    background: #dbeafe;
+    color: #1e40af;
+    margin-bottom: 15px;
+  }
+
+  .detail-description {
+    font-size: 16px;
+    color: #374151;
+    line-height: 1.6;
+    margin-top: 10px;
+  }
+
+  .detail-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 150px;
+  }
+
+  .btn-edit {
+    padding: 10px 16px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+  }
+
+  .btn-edit:hover {
+    background: #1d4ed8;
+  }
+
+  .btn-add {
+    padding: 10px 16px;
+    background: #10b981;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+  }
+
+  .btn-add:hover {
+    background: #059669;
+  }
+
+  .section-header {
+    margin-bottom: 20px;
+  }
+
+  .section-header h2 {
+    font-size: 28px;
+    color: #111827;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #2563eb;
+  }
+
+  .service-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .service-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 20px;
+  }
+
+  .service-name {
+    font-size: 24px;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+
+  .service-description {
+    font-size: 15px;
+    color: #6b7280;
+    line-height: 1.5;
+  }
+
+  .service-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .service-price {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2563eb;
+  }
+
+  .service-duration {
+    font-size: 14px;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 4px 12px;
+    border-radius: 12px;
+  }
+
+  .service-owner-actions {
+    margin-bottom: 20px;
+  }
+
+  .reviews-section {
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  .reviews-title {
+    font-size: 18px;
+    color: #111827;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  .review-item {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 3px solid #2563eb;
+  }
+
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .review-author {
+    font-weight: bold;
+    font-size: 15px;
+    color: #111827;
+  }
+
+  .review-rating {
+    font-size: 16px;
+    font-weight: bold;
+    color: #f59e0b;
+  }
+
+  .review-text {
+    color: #374151;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .review-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn-small {
+    padding: 6px 12px;
+    background: #e5e7eb;
+    color: #111827;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: 0.2s;
+  }
+
+  .btn-small:hover {
+    background: #d1d5db;
+  }
+
+  .btn-small-red {
+    padding: 6px 12px;
+    background: #fee2e2;
+    color: #dc2626;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: 0.2s;
+  }
+
+  .btn-small-red:hover {
+    background: #fecaca;
+  }
+
+  .no-reviews {
+    color: #6b7280;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .btn-write-review {
+    display: block;
+    padding: 12px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+    margin-top: 15px;
+  }
+
+  .btn-write-review:hover {
+    background: #1d4ed8;
+  }
+
+  .no-services {
+    text-align: center;
+    color: #6b7280;
+    font-size: 16px;
+    padding: 40px;
+    background: white;
+    border-radius: 12px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .btn-create {
+    display: inline-block;
+    padding: 14px 28px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: 0.2s;
+  }
+
+  .btn-create:hover {
+    background: #1d4ed8;
+  }
+
+  /* Form Pages (Create/Update/Delete) */
+  .form-page-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+  }
+
+  .form-page-card,
+  .confirm-delete-card {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .form-page-title {
+    font-size: 28px;
+    color: #111827;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #2563eb;
+  }
+
+  .confirm-delete-title {
+    font-size: 28px;
+    color: #dc2626;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #dc2626;
+  }
+
+  .confirm-delete-warning {
+    background: #fee2e2;
+    border-left: 4px solid #dc2626;
+    padding: 15px 20px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+  }
+
+  .warning-text {
+    color: #991b1b;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .confirm-delete-details {
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+  }
+
+  .detail-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .detail-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .detail-label {
+    font-weight: bold;
+    color: #374151;
+    min-width: 80px;
+  }
+
+  .detail-value {
+    color: #111827;
+  }
+
+  .form-actions .btn-danger {
+    background: #dc2626;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+
+  .form-actions .btn-danger:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+  }

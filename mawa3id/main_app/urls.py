@@ -12,7 +12,7 @@ urlpatterns = [
 
     # BUSINESS
     path('business/create/', views.BusinessCreate.as_view(), name= 'business_create'),
-    # path('business/dashboard/', views.BusinessDashboard.as_view(), name= 'business_dashboard'),
+    path('business/dashboard/', views.BusinessDashboard.as_view(), name= 'business_dashboard'),
     path('business/<int:pk>/', views.BusinessDetail.as_view(), name= 'business_detail'),
     path('business/<int:pk>/update', views.BusinessUpdate.as_view(), name= 'business_update'),
 
@@ -25,6 +25,7 @@ urlpatterns = [
     path('slot/<int:pk>/book', views.BookingCreate.as_view(), name='booking_create'),
     path('booking/<int:pk>/update', views.BookingUpdate.as_view(), name='booking_update'),
     path('booking/<int:pk>/delete', views.BookingDelete.as_view(), name='booking_delete'),
+    path("booking/<int:pk>/status/", views.BookingStatusUpdate.as_view(), name="booking_status_update"),
 
 
     # SERVICE

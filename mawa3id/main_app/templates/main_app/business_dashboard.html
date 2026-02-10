@@ -56,7 +56,17 @@
           <div><strong>Status:</strong> {{ b.status }}</div>
 
           <div>
-            <a href="{% url 'booking_update' pk=b.id %}">Edit status</a>
+                  <form method="post" action="{% url 'booking_status_update' pk=b.id %}">
+                    {% csrf_token %}
+                    <select name="status">
+                      {% for value, label in b.Status.choices %}
+                        <option value="{{ value }}" {% if b.status == value %}selected{% endif %}>
+                          {{ label }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                    <button type="submit">Update</button>
+                  </form>
           </div>
         </li>
         <hr>
@@ -95,9 +105,18 @@
                     —
                     {% if b.client %}{{ b.client.username }}{% else %}Client{% endif %}
                     —
-                    {{ b.status }}
-                    |
-                    <a href="{% url 'booking_update' pk=b.id %}">Edit</a>
+                    {{b.status}}
+                  <form method="post" action="{% url 'booking_status_update' pk=b.id %}">
+                    {% csrf_token %}
+                    <select name="status">
+                      {% for value, label in b.Status.choices %}
+                        <option value="{{ value }}" {% if b.status == value %}selected{% endif %}>
+                          {{ label }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                    <button type="submit">Update</button>
+                  </form>
                   </li>
                 {% endfor %}
               </ul>
@@ -107,6 +126,17 @@
       </tr>
     {% endfor %}
   </table>
+
+
+
+
+
+
+
+
+
+
+
 
 {% endif %}
 
