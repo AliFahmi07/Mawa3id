@@ -504,7 +504,7 @@ class BusinessUpdate(UpdateView):
         return Business.objects.filter(owner=self.request.user)
 
     def get_success_url(self):
-        return reverse("business_detail", kwargs={'pk':self.request.user.id})
+        return reverse("business_detail", kwargs={'pk':self.object.pk})
 
 
 class BusinessList(ListView):

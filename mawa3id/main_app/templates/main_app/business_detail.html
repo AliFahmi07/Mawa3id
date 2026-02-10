@@ -2,102 +2,65 @@
 
 {% block content %}
 <div class="detail-container">
-  {% if object %}
-    <!-- Business Info Card -->
-    <div class="detail-header-card">
-      <div class="detail-header-content">
-{% if object %}
-<h1>Business</h1>
-<div>
-    <div>
-        <span>name:{{ business.name }}</span><br>
-        <span>category:{{ business.category }}</span><br>
-        <span>description:{{ business.description }}</span>
-        {% if user == business.owner %}
-        <div>
-          <h1 class="detail-title">{{ business.name }}</h1>
-          <span class="detail-category">{{ business.category }}</span>
-          <p class="detail-description">{{ business.description }}</p>
-        </div>
 
-        {% if user == business.owner %}
-        <div class="detail-actions">
-          <a href="{% url 'business_update' business.id %}" class="btn-edit">Edit Business</a>
-          <a href="{% url 'service_create' pk=business.id %}" class="btn-add">Add Service</a>
-          <a href="{% url 'timeslot_create' pk=object.id %}" class="btn-add">Add Time Slot</a>
-        </div>
-        {% endif %}
-      </div>
-    </div>
+{% if business %}
+  <h1 class="detail-title">{{ business.name }}</h1>
+  <span class="detail-category">{{ business.category }}</span>
+  <p class="detail-description">{{ business.description }}</p>
 
-    <!-- Services Section -->
-    <div class="section-header">
-      <h2>Services</h2>
-    </div>
-
-    {% if business.services.count %}
-      {% for service in services %}
-      <div class="service-card">
-        <div class="service-header">
-          <div>
-            <h3 class="service-name">{{ service.name }}</h3>
-            <p class="service-description">{{ service.description }}</p>
-          </div>
-          <div class="service-meta">
-            <span class="service-price">${{ service.price }}</span>
-            <span class="service-duration">{{ service.time }} mins</span>
-          </div>
-        </div>
-
-        {% if user == business.owner %}
-        <div class="service-owner-actions">
-          <a href="{% url 'service_update' pk=business.id service_id=service.id %}" class="btn-link">Edit Service</a>
-        </div>
-        {% endif %}
-
-        <!-- Reviews Section -->
-        <div class="reviews-section">
-          <h4 class="reviews-title">Reviews ({{ service.reviews.count }})</h4>
-
-          {% if service.reviews.count %}
-            <div class="reviews-list">
-              {% for review in service.reviews.all %}
-              <div class="review-item">
-                <div class="review-header">
-                  <span class="review-author">{{ review.user.username }}</span>
-                  <span class="review-rating">{{ review.rating }} ★</span>
-                </div>
-                <p class="review-text">{{ review.text }}</p>
-
-                {% if user == review.user %}
-                <div class="review-actions">
-                  <a href="{% url 'review_update' review.id %}" class="btn-small">Edit</a>
-                  <a href="{% url 'review_delete' review.id %}" class="btn-small-red">Delete</a>
-                </div>
-                {% endif %}
-              </div>
-              {% endfor %}
-            </div>
-          {% else %}
-            <p class="no-reviews">No reviews yet. Be the first!</p>
-          {% endif %}
-
-          {% if user.is_authenticated and user.profile.role == 'client' %}
-            {% if not service.user_review %}
-              <a href="{% url 'review_create' service.id %}" class="btn-write-review">Write a Review</a>
-            {% endif %}
-          {% endif %}
-        </div>
-      </div>
-      {% endfor %}
-    {% else %}
-      <p class="no-services">No services available yet</p>
-    {% endif %}
-
-  {% else %}
-    <div class="empty-state">
-      <a href="{% url 'business_create' %}" class="btn-create">Create Business</a>
-    </div>
+  {% if user == business.owner %}
+  <div class="detail-actions">
+    <a href="{% url 'business_update' business.id %}" class="btn-edit">Edit Business</a>
+    <a href="{% url 'service_create' pk=business.id %}" class="btn-add">Add Service</a>
+    <a href="{% url 'timeslot_create' pk=business.id %}" class="btn-add">Add Time Slot</a>
+  </div>
   {% endif %}
+
+  <!-- SERVICES -->
+  <h2>Services</h2>
+
+  {% if services %}
+    {% for service in services %}
+      <div class="service-card">
+        <h3>{{ service.name }}</h3>
+        <p>{{ service.description }}</p>
+        <p>${{ service.price }} | {{ service.time }} mins</p>
+
+        {% if user == business.owner %}
+          <a href="{% url 'service_update' pk=business.id service_id=service.id %}">Edit Service</a>
+        {% endif %}
+
+        <!-- REVIEWS -->
+        <h4>Reviews ({{ service.reviews.count }})</h4>
+
+        {% if service.reviews.all %}
+          {% for review in service.reviews.all %}
+            <div class="review-item">
+              <strong>{{ review.user.username }}</strong> - {{ review.rating }} ★
+              <p>{{ review.text }}</p>
+
+              {% if user == review.user %}
+                <a href="{% url 'review_update' review.id %}">Edit</a>
+                <a href="{% url 'review_delete' review.id %}">Delete</a>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% else %}
+          <p>No reviews yet.</p>
+        {% endif %}
+
+        {% if user.is_authenticated and user.profile.role == "client" %}
+          <a href="{% url 'review_create' service.id %}">Write Review</a>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No services yet.</p>
+  {% endif %}
+
+{% else %}
+  <a href="{% url 'business_create' %}">Create Business</a>
+{% endif %}
+
 </div>
-{% endblock content %}
+{% endblock %}
