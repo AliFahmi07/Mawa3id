@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django import forms
 from django.utils import timezone
+from django.db.models import Avg
 from datetime import datetime
 from django.conf import settings
 from allauth.socialaccount.models import SocialAccount
@@ -15,7 +16,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Business, Profile, Service, Review, TimeSlot, Booking
 from django.urls import reverse
 from django.views import View
-from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm, BusinessEditForm
+from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .google_calendar import create_event_for_booking, update_event_for_booking, delete_event_for_booking
 import calendar
@@ -27,11 +28,11 @@ import calendar
 
 def home(request):
     businesses = Business.objects.all().order_by("category", "name")
-    
+
     # Don't show buzznes to business owners
     if request.user.is_authenticated and request.user.profile.role == Profile.Role.BUSINESS_OWNER:
         businesses = Business.objects.none()
-    
+
     return render(request, "home.html", {"businesses": businesses})
 
 def signup(request):
@@ -249,6 +250,7 @@ class BusinessDashboard(LoginRequiredMixin, View):
     def get(self, request):
         business = self._get_business(request)
         year, month = self._get_year_month(request)
+        services = Service.objects.filter(business=business).order_by("id")
 
         business_form = self.BusinessEditForm(instance=business)
         weeks = self._month_grid_with_bookings(business, year, month)
@@ -259,6 +261,22 @@ class BusinessDashboard(LoginRequiredMixin, View):
             .select_related("slot", "client", "slot__service", "slot__business")
             .order_by("-slot__start")
         )
+        slots = (
+            TimeSlot.objects
+            .filter(business=business)
+            .select_related("service")
+            .order_by("start")
+        )
+        edit_slot_id = request.GET.get("edit_slot")
+        edit_slot_id = int(edit_slot_id) if edit_slot_id and edit_slot_id.isdigit() else None
+
+        reviews = (
+            Review.objects
+            .filter(service__business=business)
+            .select_related("user", "service")
+            .order_by("-created_at")
+    )
+        avg_rating = reviews.aggregate(avg=Avg("rating"))["avg"]
 
         calendar_src = None
 
@@ -273,6 +291,8 @@ class BusinessDashboard(LoginRequiredMixin, View):
         if google_account:
             calendar_src = google_account.extra_data.get("email") or owner.email
 
+        edit_mode = request.GET.get("edit") == "1"
+
         context = {
             "business": business,
             "business_form": business_form,
@@ -284,7 +304,16 @@ class BusinessDashboard(LoginRequiredMixin, View):
             "calendar_src": calendar_src,
             "calendar_tz": getattr(settings, "TIME_ZONE", "UTC"),
             "has_google": has_google,
+            "services": services,
+            "reviews": reviews,
+            "avg_rating": avg_rating,
+            "slots": slots,
+            "edit_slot_id": edit_slot_id,
+            "edit_mode": edit_mode,
         }
+
+        edit_service_id = request.GET.get("edit_service")
+        context["edit_service_id"] = int(edit_service_id) if edit_service_id else None
 
         return render(request, self.template_name, context)
 
@@ -397,7 +426,7 @@ class TimeSlotCreate(CreateView):
 
 
     def get_success_url(self):
-        return reverse('timeslot_list', kwargs={'pk': self.object.business_id})
+        return reverse('business_dashboard')
 
 
 class TimeSlotList(ListView):
@@ -420,14 +449,14 @@ class TimeSlotUpdate(UpdateView):
     form_class = TimeSlotForm
 
     def get_success_url(self):
-        return reverse("timeslot_list", kwargs={"pk": self.object.business_id})
+        return reverse('business_dashboard')
 
 
 class TimeSlotDelete(DeleteView):
     model = TimeSlot
 
     def get_success_url(self):
-        return reverse("timeslot_list", kwargs={"pk": self.object.business_id})
+        return reverse('business_dashboard')
 
 
 class BookingCreate(CreateView):
@@ -553,7 +582,7 @@ class ServiceCreate(CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('business_detail', kwargs={'pk':self.object.business.id})
+        return reverse('business_dashboard')
 
 
 
@@ -573,16 +602,20 @@ class ServiceUpdate(UpdateView):
         service_id = self.kwargs.get("service_id")
         # Filter service that belongs to the business
         return get_object_or_404(Service, id=service_id)
+    def get_queryset(self):
+        return Service.objects.filter(business__owner=self.request.user)
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse("business_detail", kwargs={"pk": self.kwargs.get("pk")})
+        return reverse('business_dashboard')
 
 class ServiceDelete(DeleteView):
     model = Service
     pk_url_kwarg = "service_id"
 
     def get_success_url(self):
-        return reverse("business_detail", kwargs={"pk": self.kwargs["pk"]})
+        return reverse('business_dashboard')
 
 #===========================================================================================================
 #Review
