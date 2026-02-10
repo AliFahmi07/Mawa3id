@@ -83,7 +83,7 @@ def posts_detail(request, posts_id):
     return render(request, 'posts/detail.html', {'posts': posts})
 
 
-class ProfileCreate(CreateView):
+class ProfileCreate(LoginRequiredMixin, CreateView):
     model = Profile
     fields = ["image", "role"]
 
@@ -97,7 +97,7 @@ class ProfileCreate(CreateView):
         return reverse("home")
 
 
-class ProfileDetail(DetailView):
+class ProfileDetail(LoginRequiredMixin, DetailView):
     model = Profile
     def get_object(self):
         return Profile.objects.get(user=self.request.user)
@@ -125,7 +125,7 @@ class ProfileDetail(DetailView):
 
 
 
-class ProfileUpdateView(View):
+class ProfileUpdateView(LoginRequiredMixin, View):
     def get(self, request):
         user_form = UserUpdateForm(instance=request.user)
         profile_form = ProfileUpdateForm(instance=request.user.profile)
@@ -157,7 +157,7 @@ class ProfileUpdateView(View):
 #===========================================================================================================
 # Business
 
-class BusinessCreate(CreateView):
+class BusinessCreate(LoginRequiredMixin, CreateView):
     model = Business
     fields = ["name", "description", "category"]
     success_url = "/"
@@ -175,7 +175,7 @@ class BusinessCreate(CreateView):
 
 
 
-class BusinessDetail(DetailView):
+class BusinessDetail(LoginRequiredMixin, DetailView):
     model = Business
     template_name = "main_app/business_detail.html"
 
@@ -343,7 +343,7 @@ class BusinessDashboard(LoginRequiredMixin, View):
 #===========================================================================================================
 #POSTS
 
-class PostCreate(CreateView):
+class PostCreate(LoginRequiredMixin, CreateView):
     model = Posts
     fields = ['description', 'price']
     template_name = 'posts/posts_form.html'
@@ -354,7 +354,7 @@ class PostCreate(CreateView):
         return super().form_valid(form)
 
 
-class PostUpdate(UpdateView):
+class PostUpdate(LoginRequiredMixin, UpdateView):
     model = Posts
     fields = ['description', 'price']
     template_name = 'posts/posts_form.html'
@@ -363,7 +363,7 @@ class PostUpdate(UpdateView):
     def get_queryset(self):
         return Posts.objects.filter(user=self.request.user)
 
-class PostDelete(DeleteView):
+class PostDelete(LoginRequiredMixin, DeleteView):
     model = Posts
     template_name = 'posts/posts_confirm_delete.html'
     success_url = '/posts/'
@@ -392,7 +392,7 @@ def post_accept(request, posts_id):
 
     return render(request, 'posts/post_accepted.html', {'post': post})
 
-class BusinessUpdate(UpdateView):
+class BusinessUpdate(LoginRequiredMixin, UpdateView):
     model = Business
     fields = ["name", "description", "category"]
 
@@ -410,7 +410,7 @@ class BusinessList(ListView):
 #===========================================================================================================
 #Appointments
 
-class TimeSlotCreate(CreateView):
+class TimeSlotCreate(LoginRequiredMixin, CreateView):
     model = TimeSlot
     form_class = TimeSlotForm
 
@@ -444,7 +444,7 @@ class TimeSlotList(ListView):
         return context
 
 
-class TimeSlotUpdate(UpdateView):
+class TimeSlotUpdate(LoginRequiredMixin, UpdateView):
     model = TimeSlot
     form_class = TimeSlotForm
 
@@ -452,14 +452,14 @@ class TimeSlotUpdate(UpdateView):
         return reverse('business_dashboard')
 
 
-class TimeSlotDelete(DeleteView):
+class TimeSlotDelete(LoginRequiredMixin, DeleteView):
     model = TimeSlot
 
     def get_success_url(self):
         return reverse('business_dashboard')
 
 
-class BookingCreate(CreateView):
+class BookingCreate(LoginRequiredMixin, CreateView):
     model = Booking
     fields = ['notes']
 
@@ -507,7 +507,7 @@ class BookingCreate(CreateView):
     def get_success_url(self):
         return reverse("timeslot_list", kwargs={"pk": self.object.slot.business_id})
 
-class BookingUpdate(UpdateView):
+class BookingUpdate(LoginRequiredMixin, UpdateView):
     model = Booking
     fields = ["status"]
     template_name="main_app/booking_form.html"
@@ -530,7 +530,7 @@ class BookingUpdate(UpdateView):
             return reverse("timeslot_list", kwargs={"pk": self.object.slot.business_id})
 
 
-class BookingStatusUpdate(UpdateView):
+class BookingStatusUpdate(LoginRequiredMixin, UpdateView):
         model = Booking
         fields = ['status']
 
@@ -551,7 +551,7 @@ class BookingStatusUpdate(UpdateView):
             return reverse("business_dashboard")
 
 
-class BookingDelete(DeleteView):
+class BookingDelete(LoginRequiredMixin, DeleteView):
     model = Booking
 
     def get_queryset(self):
@@ -573,7 +573,7 @@ class BookingDelete(DeleteView):
 # ===========================================================================================================
 # Service
 
-class ServiceCreate(CreateView):
+class ServiceCreate(LoginRequiredMixin, CreateView):
     model = Service
     fields = ["name", "description", "time", "price"]
 
@@ -586,7 +586,7 @@ class ServiceCreate(CreateView):
 
 
 
-class ServiceDetail(DetailView):
+class ServiceDetail(LoginRequiredMixin, DetailView):
     model = Service
     template_name = "main_app/service_detail.html"
 
@@ -610,7 +610,7 @@ class ServiceUpdate(UpdateView):
     def get_success_url(self):
         return reverse('business_dashboard')
 
-class ServiceDelete(DeleteView):
+class ServiceDelete(LoginRequiredMixin, DeleteView):
     model = Service
     pk_url_kwarg = "service_id"
 
