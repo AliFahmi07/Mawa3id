@@ -172,6 +172,13 @@ class BusinessDetail(DetailView):
     def get_object(self):
         return get_object_or_404(Business, pk=self.kwargs["pk"])
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            for service in self.object.services.all():
+                service.user_review = service.reviews.filter(user=self.request.user).first()
+        return context
+
 #===========================================================================================================
 #POSTS
 
@@ -423,40 +430,35 @@ class ServiceDelete(DeleteView):
 #===========================================================================================================
 #Review
 
-@login_required
-def add_review(request, service_id):
-    """Add a review to a service - prevents duplicates"""
-    service = get_object_or_404(Service, id=service_id)
-    business_id = service.business_id
+class ReviewCreate(LoginRequiredMixin, CreateView):
+    model = Review
+    fields = ['rating', 'text']
+    template_name = 'main_app/review_form.html'
 
-    # Only clients can write reviews
-    if request.user.profile.role != Profile.Role.CLIENT:
-        return redirect("business_detail", pk=business_id)
+    def form_valid(self, form):
+        service = get_object_or_404(Service, id=self.kwargs['service_id'])
+        
+        if self.request.user.profile.role != Profile.Role.CLIENT:
+            return redirect("business_detail", pk=service.business_id)
+        
+        if Review.objects.filter(service=service, user=self.request.user).exists():
+            return redirect("business_detail", pk=service.business_id)
+        
+        form.instance.service = service
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
-    # Check if user already reviewed this service
-    if Review.objects.filter(service=service, user=request.user).exists():
-        return redirect("business_detail", pk=business_id)
-
-    if request.method == 'POST':
-        rating = request.POST.get('rating')
-        text = request.POST.get('text', '').strip()
-
-        # Validate
-        if rating and text and len(text) <= 500:
-            Review.objects.create(
-                service=service,
-                user=request.user,
-                rating=int(rating),
-                text=text
-            )
-
-    return redirect("business_detail", pk=business_id)
+    def get_success_url(self):
+        return reverse("business_detail", kwargs={"pk": self.object.service.business_id})
 
 
 class ReviewUpdate(LoginRequiredMixin, UpdateView):
     model = Review
     fields = ['rating', 'text']
     template_name = 'main_app/review_form.html'
+
+    def get_queryset(self):
+        return Review.objects.filter(user=self.request.user)
 
     def get_success_url(self):
         return reverse("business_detail", kwargs={"pk": self.object.service.business_id})
@@ -465,6 +467,9 @@ class ReviewUpdate(LoginRequiredMixin, UpdateView):
 class ReviewDelete(LoginRequiredMixin, DeleteView):
     model = Review
     template_name = 'main_app/review_confirm_delete.html'
+
+    def get_queryset(self):
+        return Review.objects.filter(user=self.request.user)
 
     def get_success_url(self):
         return reverse("business_detail", kwargs={"pk": self.object.service.business_id})
