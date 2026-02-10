@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django import forms
 from django.utils import timezone
+from django.db.models import Avg
 from datetime import datetime
 from django.conf import settings
 # from allauth.socialaccount.models import SocialAccount
@@ -15,7 +16,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Business, Profile, Service, Review, TimeSlot, Booking
 from django.urls import reverse
 from django.views import View
-from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm, BusinessEditForm
+from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .google_calendar import create_event_for_booking, update_event_for_booking, delete_event_for_booking
 import calendar
@@ -98,7 +99,7 @@ def posts_detail(request, posts_id):
     return render(request, 'posts/detail.html', {'posts': posts})
 
 
-class ProfileCreate(CreateView):
+class ProfileCreate(LoginRequiredMixin, CreateView):
     model = Profile
     fields = ["image", "role"]
 
@@ -112,7 +113,7 @@ class ProfileCreate(CreateView):
         return reverse("home")
 
 
-class ProfileDetail(DetailView):
+class ProfileDetail(LoginRequiredMixin, DetailView):
     model = Profile
     def get_object(self):
         return Profile.objects.get(user=self.request.user)
@@ -140,7 +141,7 @@ class ProfileDetail(DetailView):
 
 
 
-class ProfileUpdateView(View):
+class ProfileUpdateView(LoginRequiredMixin, View):
     def get(self, request):
         user_form = UserUpdateForm(instance=request.user)
         profile_form = ProfileUpdateForm(instance=request.user.profile)
@@ -172,7 +173,7 @@ class ProfileUpdateView(View):
 #===========================================================================================================
 # Business
 
-class BusinessCreate(CreateView):
+class BusinessCreate(LoginRequiredMixin, CreateView):
     model = Business
     fields = ["name", "description", "category"]
     success_url = "/"
@@ -307,7 +308,7 @@ class BusinessDashboard(LoginRequiredMixin, View):
 
     #AI <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-class BusinessDetail(DetailView):
+class BusinessDetail(LoginRequiredMixin, DetailView):
     model = Business
     template_name = "main_app/business_detail.html"
 
@@ -317,11 +318,28 @@ class BusinessDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         services = list(self.object.services.all())
+        service_id = self.request.GET.get("service")
 
         if self.request.user.is_authenticated:
             for service in services:
                 service.user_review = service.reviews.filter(user=self.request.user).first()
+
+        slots = (
+            TimeSlot.objects
+            .filter(
+                business=self.object,
+                is_active=True,
+                start__gt=timezone.now(),
+                booking__isnull=True,
+            )
+            .select_related("service", "business")
+            .order_by("start")
+        )
+
         context['services'] = services
+        context["slots"] = slots
+        context["service_id"] = service_id
+        context["now"] = timezone.now()
         return context
 
 # AI >>>>>>>>>>>>>>>>>>>>>>>>>
@@ -382,6 +400,7 @@ class BusinessDashboard(LoginRequiredMixin, View):
     def get(self, request):
         business = self._get_business(request)
         year, month = self._get_year_month(request)
+        services = Service.objects.filter(business=business).order_by("id")
 
         business_form = self.BusinessEditForm(instance=business)
         weeks = self._month_grid_with_bookings(business, year, month)
@@ -392,6 +411,22 @@ class BusinessDashboard(LoginRequiredMixin, View):
             .select_related("slot", "client", "slot__service", "slot__business")
             .order_by("-slot__start")
         )
+        slots = (
+            TimeSlot.objects
+            .filter(business=business)
+            .select_related("service")
+            .order_by("start")
+        )
+        edit_slot_id = request.GET.get("edit_slot")
+        edit_slot_id = int(edit_slot_id) if edit_slot_id and edit_slot_id.isdigit() else None
+
+        reviews = (
+            Review.objects
+            .filter(service__business=business)
+            .select_related("user", "service")
+            .order_by("-created_at")
+    )
+        avg_rating = reviews.aggregate(avg=Avg("rating"))["avg"]
 
         calendar_src = None
 
@@ -406,6 +441,8 @@ class BusinessDashboard(LoginRequiredMixin, View):
         if google_account:
             calendar_src = google_account.extra_data.get("email") or owner.email
 
+        edit_mode = request.GET.get("edit") == "1"
+
         context = {
             "business": business,
             "business_form": business_form,
@@ -417,7 +454,16 @@ class BusinessDashboard(LoginRequiredMixin, View):
             "calendar_src": calendar_src,
             "calendar_tz": getattr(settings, "TIME_ZONE", "UTC"),
             "has_google": has_google,
+            "services": services,
+            "reviews": reviews,
+            "avg_rating": avg_rating,
+            "slots": slots,
+            "edit_slot_id": edit_slot_id,
+            "edit_mode": edit_mode,
         }
+
+        edit_service_id = request.GET.get("edit_service")
+        context["edit_service_id"] = int(edit_service_id) if edit_service_id else None
 
         return render(request, self.template_name, context)
 
@@ -447,7 +493,7 @@ class BusinessDashboard(LoginRequiredMixin, View):
 #===========================================================================================================
 #POSTS
 
-class PostCreate(CreateView):
+class PostCreate(LoginRequiredMixin, CreateView):
     model = Posts
     fields = ['description', 'price']
     template_name = 'posts/posts_form.html'
@@ -458,7 +504,7 @@ class PostCreate(CreateView):
         return super().form_valid(form)
 
 
-class PostUpdate(UpdateView):
+class PostUpdate(LoginRequiredMixin, UpdateView):
     model = Posts
     fields = ['description', 'price']
     template_name = 'posts/posts_form.html'
@@ -467,7 +513,7 @@ class PostUpdate(UpdateView):
     def get_queryset(self):
         return Posts.objects.filter(user=self.request.user)
 
-class PostDelete(DeleteView):
+class PostDelete(LoginRequiredMixin, DeleteView):
     model = Posts
     template_name = 'posts/posts_confirm_delete.html'
     success_url = '/posts/'
@@ -496,7 +542,7 @@ def post_accept(request, posts_id):
 
     return render(request, 'posts/post_accepted.html', {'post': post})
 
-class BusinessUpdate(UpdateView):
+class BusinessUpdate(LoginRequiredMixin, UpdateView):
     model = Business
     fields = ["name", "description", "category"]
 
@@ -514,7 +560,7 @@ class BusinessList(ListView):
 #===========================================================================================================
 #Appointments
 
-class TimeSlotCreate(CreateView):
+class TimeSlotCreate(LoginRequiredMixin, CreateView):
     model = TimeSlot
     form_class = TimeSlotForm
 
@@ -540,7 +586,7 @@ class TimeSlotCreate(CreateView):
 
 
     def get_success_url(self):
-        return reverse('timeslot_list', kwargs={'pk': self.object.business_id})
+        return reverse('business_dashboard')
 
 
 class TimeSlotList(ListView):
@@ -558,22 +604,22 @@ class TimeSlotList(ListView):
         return context
 
 
-class TimeSlotUpdate(UpdateView):
+class TimeSlotUpdate(LoginRequiredMixin, UpdateView):
     model = TimeSlot
     form_class = TimeSlotForm
 
     def get_success_url(self):
-        return reverse("timeslot_list", kwargs={"pk": self.object.business_id})
+        return reverse('business_dashboard')
 
 
-class TimeSlotDelete(DeleteView):
+class TimeSlotDelete(LoginRequiredMixin, DeleteView):
     model = TimeSlot
 
     def get_success_url(self):
-        return reverse("timeslot_list", kwargs={"pk": self.object.business_id})
+        return reverse('business_dashboard')
 
 
-class BookingCreate(CreateView):
+class BookingCreate(LoginRequiredMixin, CreateView):
     model = Booking
     fields = ['notes']
 
@@ -619,9 +665,9 @@ class BookingCreate(CreateView):
 
 
     def get_success_url(self):
-        return reverse("timeslot_list", kwargs={"pk": self.object.slot.business_id})
+            return reverse("business_detail", kwargs={"pk": self.object.slot.business_id})
 
-class BookingUpdate(UpdateView):
+class BookingUpdate(LoginRequiredMixin, UpdateView):
     model = Booking
     fields = ["status"]
     template_name="main_app/booking_form.html"
@@ -644,7 +690,7 @@ class BookingUpdate(UpdateView):
             return reverse("timeslot_list", kwargs={"pk": self.object.slot.business_id})
 
 
-class BookingStatusUpdate(UpdateView):
+class BookingStatusUpdate(LoginRequiredMixin, UpdateView):
         model = Booking
         fields = ['status']
 
@@ -665,7 +711,7 @@ class BookingStatusUpdate(UpdateView):
             return reverse("business_dashboard")
 
 
-class BookingDelete(DeleteView):
+class BookingDelete(LoginRequiredMixin, DeleteView):
     model = Booking
 
     def get_queryset(self):
@@ -687,7 +733,7 @@ class BookingDelete(DeleteView):
 # ===========================================================================================================
 # Service
 
-class ServiceCreate(CreateView):
+class ServiceCreate(LoginRequiredMixin, CreateView):
     model = Service
     fields = ["name", "description", "time", "price"]
 
@@ -696,7 +742,7 @@ class ServiceCreate(CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('business_detail', kwargs={'pk':self.object.business.id})
+        return reverse('business_dashboard')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -704,7 +750,7 @@ class ServiceCreate(CreateView):
         return context
 
 
-class ServiceDetail(DetailView):
+class ServiceDetail(LoginRequiredMixin, DetailView):
     model = Service
     template_name = "main_app/service_detail.html"
 
@@ -720,21 +766,25 @@ class ServiceUpdate(UpdateView):
         service_id = self.kwargs.get("service_id")
         # Filter service that belongs to the business
         return get_object_or_404(Service, id=service_id)
+    def get_queryset(self):
+        return Service.objects.filter(business__owner=self.request.user)
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse("business_detail", kwargs={"pk": self.kwargs.get("pk")})
+        return reverse('business_dashboard')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['business'] = Business.objects.get(owner=self.request.user)
         return context
 
-class ServiceDelete(DeleteView):
+class ServiceDelete(LoginRequiredMixin, DeleteView):
     model = Service
     pk_url_kwarg = "service_id"
 
     def get_success_url(self):
-        return reverse("business_detail", kwargs={"pk": self.kwargs["pk"]})
+        return reverse('business_dashboard')
 
 #===========================================================================================================
 #Review

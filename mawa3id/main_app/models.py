@@ -139,24 +139,34 @@ class Review(models.Model):
 
     service = models.ForeignKey(
         Service,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="reviews",
         )
 
     user = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         )
 
-    text = models.TextField()
+    text = models.TextField(
+        blank=True,
+        default="",
+    )
 
     rating = models.IntegerField(
         choices=Rating.choices,
         default=Rating.FIVE,
     )
+    created_at = models.DateTimeField(
+        auto_now_add=True
+        )
 
     def __str__(self):
-        return f"Review by {self.user.username} - {self.rating} stars"
+        return f"{self.user.username} - {self.rating} stars"
 
 #===========================================================================================================
 

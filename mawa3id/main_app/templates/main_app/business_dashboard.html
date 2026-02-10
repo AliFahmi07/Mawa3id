@@ -5,27 +5,25 @@
 
 <table>
   <tr>
-    <!-- LEFT -->
-    <td>
+                            <!-- Business Detail -->
 <h2>Business Details</h2>
 
-{% if request.GET.edit %}
-  <form method="post" action="{% url 'business_dashboard' %}">
+{% if edit_mode %}
+  <form method="post">
     {% csrf_token %}
     {{ business_form.as_p }}
     <button type="submit">Save</button>
-    <a href="{% url 'business_dashboard' %}">Cancel</a>
   </form>
+  <p><a href="{% url 'business_dashboard' %}">Cancel</a></p>
 {% else %}
   <p><strong>Name:</strong> {{ business.name }}</p>
   <p><strong>Description:</strong> {{ business.description }}</p>
   <p><strong>Category:</strong> {{ business.category }}</p>
-
-  <a href="{% url 'business_dashboard' %}?edit=1">Edit</a>
+  <p><a href="{% url 'business_dashboard' %}?edit=1">Edit</a></p>
 {% endif %}
-    </td>
+<br><br><br>
 
-    <!-- RIGHT -->
+                          <!-- Calendar -->
 
     <td>
     {% if has_google and calendar_src %}
@@ -41,6 +39,7 @@
 
   {% if bookings %}
     <ul>
+      <h2>Bookings</h2>
       {% for b in bookings %}
         <li>
           <div><strong>Date/Time:</strong> {% load tz %} {{ b.slot.start|localtime|date:"Y-m-d H:i" }}</div>
@@ -54,6 +53,19 @@
           </div>
 
           <div><strong>Status:</strong> {{ b.status }}</div>
+
+          <div>
+  <strong>Booking Status:</strong>
+  {% if slot.booking %}
+    Booked
+  {% else %}
+    Available
+  {% endif %}
+</div>
+
+{% if slot.booking %}
+  <div><strong>Client:</strong> {{ slot.booking.client.username }}</div>
+{% endif %}
 
           <div>
                   <form method="post" action="{% url 'booking_status_update' pk=b.id %}">
@@ -126,18 +138,160 @@
       </tr>
     {% endfor %}
   </table>
+  {% endif %}
 
 
 
 
 
 
+  <!-- Slots -->
 
 
+<h2>Slots</h2>
 
-
-
-
+{% if request.user == business.owner %}
+  <p><a href="{% url 'timeslot_create' pk=business.id %}">Add Slot</a></p>
 {% endif %}
 
-{% endblock %}
+{% if slots %}
+  <ul>
+    {% for slot in slots %}
+      <li>
+        {% if edit_slot_id == slot.id and request.user == business.owner %}
+          <form method="post" action="{% url 'timeslot_update' pk=slot.id %}">
+            {% csrf_token %}
+
+            <p>
+              Service:
+              <select name="service">
+                <option value="">—</option>
+                {% for s in services %}
+                  <option value="{{ s.id }}" {% if slot.service_id == s.id %}selected{% endif %}>
+                    {{ s.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </p>
+
+            <p>
+              Start:
+              <input type="datetime-local" name="start" value="{{ slot.start|date:'Y-m-d\\TH:i' }}">
+            </p>
+
+            <p>
+              Duration (mins):
+              <input type="number" name="duration" value="{{ slot.duration }}">
+            </p>
+
+            <p>
+              Active:
+              <input type="checkbox" name="is_active" {% if slot.is_active %}checked{% endif %}>
+            </p>
+
+            <button type="submit">Save</button>
+          </form>
+
+          <a href="{% url 'business_dashboard' %}">Cancel</a>
+
+        {% else %}
+          <div><strong>Start:</strong> {{ slot.start }}</div>
+          <div><strong>Duration:</strong> {{ slot.duration }} mins</div>
+          <div><strong>Service:</strong> {% if slot.service %}{{ slot.service.name }}{% else %}—{% endif %}</div>
+          <div><strong>Status:</strong> {% if slot.is_active %}Active{% else %}Inactive{% endif %}</div>
+
+          {% if request.user == business.owner %}
+            <div>
+              <a href="{% url 'business_dashboard' %}?edit_slot={{ slot.id }}">Edit Slot</a>
+              |
+              <a href="{% url 'timeslot_delete' pk=slot.id %}">Delete Slot</a>
+            </div>
+          {% endif %}
+
+          {% if slot.booking %}
+            <div><strong>Booked by:</strong> {{ slot.booking.client.username }}</div>
+            <div><strong>Booking status:</strong> {{ slot.booking.status }}</div>
+          {% endif %}
+        {% endif %}
+      </li>
+      <br><br><br><br>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No slots yet.</p>
+{% endif %}
+
+
+
+<!-- Services  -->
+ <hr>
+<h2>Services</h2>
+
+<p><a href="{% url 'service_create' pk=business.id %}">Add Service</a></p>
+
+{% if services %}
+  <ul>
+    {% for s in services %}
+      <li>
+        <strong>Service:</strong> {{ s.name }} <br>
+        <strong>Price:</strong> {{ s.price }} <br>
+        <strong>Estimated time:</strong> {{ s.time }} <br>
+        <strong>Description:</strong> {{ s.description }} <br>
+
+        {% if edit_service_id == s.id %}
+          <form method="post" action="{% url 'service_update' pk=s.id service_id=s.id%}">
+            {% csrf_token %}
+            <p>Name: <input type="text" name="name" value="{{ s.name }}"></p>
+            <p>Description: <input type="text" name="description" value="{{ s.description }}"></p>
+            <p>Time: <input type="number" name="time" value="{{ s.time }}"></p>
+            <p>Price: <input type="number" name="price" value="{{ s.price }}"></p>
+            <button type="submit">Save</button>
+          </form>
+
+          <a href="{% url 'business_dashboard' %}">Cancel</a>
+        {% else %}
+          <a href="{% url 'business_dashboard' %}?edit_service={{ s.id }}">Edit</a>
+          <a href="{% url 'service_delete' pk=s.id service_id=s.id%}">Delete</a>
+        {% endif %}
+
+        <p>==========</p>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No services yet.</p>
+{% endif %}
+  <!-- Reviews -->
+
+<hr>
+<h2>Reviews</h2>
+
+<p><strong>Average rating:</strong> {% if avg_rating %}{{ avg_rating|floatformat:1 }}{% else %}No ratings yet{% endif %}</p>
+<hr>
+
+{% if reviews %}
+<ul>
+{% for r in reviews %}
+<li>
+<div><strong>Service:</strong> {{ r.service.name }}</div>
+<div><strong>User:</strong> {{ r.user.username }}</div>
+<div><strong>Rating:</strong> {{ r.rating }}</div>
+<div><strong>Text:</strong> {{ r.text }}</div>
+<div><strong>Date:</strong> {{ r.created_at }}</div>
+</li>
+<br><br><br>
+{% endfor %}
+</ul>
+{% else %}
+<p>No reviews yet.</p>
+{% endif %}
+
+
+
+
+
+
+
+
+
+  {% endblock %}
