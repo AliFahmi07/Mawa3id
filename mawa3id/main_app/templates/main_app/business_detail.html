@@ -28,7 +28,7 @@
 <!-- Services and Reviews Section -->
 <h2>Services</h2>
 
-{% for service in business.services.all %}
+{% for service in services %}
 <div class="card">
     <div class="card-content">
         <h3>{{ service.name }}</h3>
@@ -65,9 +65,7 @@
 
         <hr>
         {% if user.is_authenticated and user.profile.role == 'client' %}
-            {% if service.user_review %}
-                <a href="{% url 'review_update' service.user_review.id %}" class="btn">Edit Your Review</a>
-            {% else %}
+            {% if not service.user_review %}
                 <a href="{% url 'review_create' service.id %}" class="btn">Write a Review</a>
             {% endif %}
         {% endif %}
