@@ -1328,3 +1328,108 @@
   .btn-create:hover {
     background: #1d4ed8;
   }
+
+  /* Form Pages (Create/Update/Delete) */
+  .form-page-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+  }
+
+  .form-page-card {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .form-page-title {
+    font-size: 28px;
+    color: #111827;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #2563eb;
+  }
+
+  /* Confirm Delete Styles */
+  .confirm-delete-card {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .confirm-delete-title {
+    font-size: 28px;
+    color: #dc2626;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #dc2626;
+  }
+
+  .confirm-delete-warning {
+    background: #fee2e2;
+    border-left: 4px solid #dc2626;
+    padding: 15px 20px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+  }
+
+  .warning-text {
+    color: #991b1b;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .confirm-delete-details {
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+  }
+
+  .detail-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .detail-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .detail-label {
+    font-weight: bold;
+    color: #374151;
+    min-width: 80px;
+  }
+
+  .detail-value {
+    color: #111827;
+    flex: 1;
+  }
+
+  /* Button Variants */
+  .btn-danger {
+    background: #dc2626;
+    color: white;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+
+  .btn-danger:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+  }

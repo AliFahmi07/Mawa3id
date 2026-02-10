@@ -1,16 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container">
-    <h1>{% if object %}Edit Your Review{% else %}Write a Review{% endif %}</h1>
-    
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+<div class="form-page-container">
+    <div class="form-page-card">
+        <h1 class="form-page-title">{% if object %}Edit Your Review{% else %}Write a Review{% endif %}</h1>
         
-        <button type="submit" class="btn">{% if object %}Update Review{% else %}Submit Review{% endif %}</button>
-        <a href="{% url 'home' %}" class="btn grey">Cancel</a>
-    </form>
+        <form action="" method="post" class="styled-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">{% if object %}Update Review{% else %}Submit Review{% endif %}</button>
+                <a href="{{ request.META.HTTP_REFERER|default:'home' }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
 </div>
 
 {% endblock %}
