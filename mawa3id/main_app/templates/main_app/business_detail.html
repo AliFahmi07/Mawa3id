@@ -63,30 +63,13 @@
             <p>No reviews yet. Be the first!</p>
         {% endif %}
 
+        <hr>
         {% if user.is_authenticated and user.profile.role == 'client' %}
-        <div class="add-review">
-            <h5>Write a Review</h5>
-            <form action="{% url 'add_review' service.id %}" method="post">
-                {% csrf_token %}
-
-                <label for="rating">Rating:</label>
-                <select name="rating" required>
-                    <option value="">Select Rating</option>
-                    <option value="5">(5)</option>
-                    <option value="4">(4)</option>
-                    <option value="3">(3)</option>
-                    <option value="2">(2)</option>
-                    <option value="1">(1)</option>
-                </select>
-
-                <label for="text">Your Review:</label>
-                <textarea name="text" placeholder="Write your review..." maxlength="500" rows="3" required></textarea>
-
-                <button type="submit" class="btn">Submit Review</button>
-            </form>
-        </div>
-        {% elif not user.is_authenticated %}
-        <p><a href="{% url 'login' %}">Login</a> to write a review</p>
+            {% if service.user_review %}
+                <a href="{% url 'review_update' service.user_review.id %}" class="btn">Edit Your Review</a>
+            {% else %}
+                <a href="{% url 'review_create' service.id %}" class="btn">Write a Review</a>
+            {% endif %}
         {% endif %}
     </div>
 </div>
