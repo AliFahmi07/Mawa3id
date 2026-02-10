@@ -425,8 +425,15 @@ class BusinessDashboard(LoginRequiredMixin, View):
             .filter(service__business=business)
             .select_related("user", "service")
             .order_by("-created_at")
-    )
+        )
         avg_rating = reviews.aggregate(avg=Avg("rating"))["avg"]
+
+        accepted_posts = (
+            Posts.objects
+            .filter(business=business)
+            .select_related("user")
+            .order_by("-id")
+        )
 
         calendar_src = None
 
@@ -460,6 +467,7 @@ class BusinessDashboard(LoginRequiredMixin, View):
             "slots": slots,
             "edit_slot_id": edit_slot_id,
             "edit_mode": edit_mode,
+            "accepted_posts": accepted_posts,
         }
 
         edit_service_id = request.GET.get("edit_service")
@@ -478,12 +486,20 @@ class BusinessDashboard(LoginRequiredMixin, View):
 
         weeks = self._month_grid_with_bookings(business, year, month)
 
+        accepted_posts = (
+            Posts.objects
+            .filter(business=business)
+            .select_related("user")
+            .order_by("-id")
+        )
+
         context = {
             "business": business,
             "business_form": business_form,
             "year": year,
             "month": month,
             "weeks": weeks,
+            "accepted_posts": accepted_posts,
         }
         return render(request, self.template_name, context)
 
