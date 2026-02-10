@@ -21,6 +21,7 @@ from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlo
 
 def home(request):
     businesses = Business.objects.all().order_by("category", "name")
+    print(Profile.objects.get(user=request.user).role)
     return render(request, "home.html", {"businesses": businesses})
 
 def signup(request):
@@ -35,12 +36,20 @@ def signup(request):
             profile.user = user
             profile.save()
             login(request, user, backend=settings.AUTHENTICATION_BACKENDS[0],)
-            return redirect("/profile")
+
+            # Redirect based on role
+            if profile.role == "business_owner":
+                return redirect("business_create")
+            else:
+                return redirect("home")  # default fallback
+
+
+
         else:
             error_message = "Invalid signup - try again"
 
-    user_form = UserCreationForm
-    profile_form = ProfileCreateForm
+    user_form = UserCreationForm()
+    profile_form = ProfileCreateForm()
 
     context = {"user_form": user_form, "profile_form": profile_form, "error_message": error_message}
     return render(
@@ -174,23 +183,23 @@ class PostDelete(DeleteView):
 
 def post_accept(request, posts_id):
     post = Posts.objects.get(id=posts_id)
-    
+
     if request.user.profile.role != 'business_owner':
         return redirect('posts_index')
-    
+
     if post.user == request.user:
         return redirect('posts_index')
-    
+
     if post.business:
         return redirect('posts_index')
-    
+
     if not Business.objects.filter(owner=request.user).exists():
         return redirect('business_create')
-    
+
     business = Business.objects.get(owner=request.user)
     post.business = business
     post.save()
-    
+
     return render(request, 'posts/post_accepted.html', {'post': post})
 
 class BusinessUpdate(UpdateView):
@@ -374,9 +383,13 @@ class ServiceUpdate(UpdateView):
     fields = ["name", "description", "time", "price"]
     template_name = 'main_app/service_form.html'
 
-    def get_success_url(self):
-        return reverse("service_detail", kwargs={'service_id': self.object.id, })
+    def get_object(self, queryset=None):
+        service_id = self.kwargs.get("service_id")
+        # Filter service that belongs to the business
+        return get_object_or_404(Service, id=service_id)
 
+    def get_success_url(self):
+        return reverse("business_detail", kwargs={"pk": self.kwargs.get("pk")})
 
 class ServiceDelete(DeleteView):
     model = Service
