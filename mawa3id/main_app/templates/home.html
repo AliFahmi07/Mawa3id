@@ -2,10 +2,22 @@
 {%block content%}
 
 {% if user.is_authenticated %}
-  {% if businesses %}
+  {% if user_role == "client" %}
     <h2>All Businesses</h2>
-    {% load static %}
 
+    {% load static %}
+    <form method="GET" class="category-filter">
+  <select name="category" onchange="this.form.submit()">
+    <option value="">All Categories</option>
+
+    {% for value, label in categories %}
+      <option value="{{ value }}"
+        {% if selected_category == value %}selected{% endif %}>
+        {{ label }}
+      </option>
+    {% endfor %}
+  </select>
+</form>
     <div class="business-container">
     {% for buiz in businesses %}
       <div class="business-card">
@@ -26,7 +38,7 @@
           {{ buiz.description }}
         </p>
       </div>
-    
+
     {% endfor %}
     </div>
   {% else %}
