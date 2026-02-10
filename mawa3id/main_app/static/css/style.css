@@ -902,3 +902,138 @@
     margin-top: 6px;
     font-style: italic;
   }
+
+  /* Business (home.html) Styles */
+  .business-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+  }
+
+  .business-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  .business-header h1 {
+    font-size: 32px;
+    color: #111827;
+  }
+
+  .business-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+  }
+
+  .business-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .business-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  }
+
+  .business-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+  }
+
+  .business-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+
+  .business-card:hover .business-image img {
+    transform: scale(1.05);
+  }
+
+  .business-info {
+    padding: 20px;
+  }
+
+  .business-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .business-info h3 {
+    font-size: 20px;
+    margin: 0;
+  }
+
+  .business-info h3 a {
+    color: #111827;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .business-info h3 a:hover {
+    color: #2563eb;
+  }
+
+  .business-category {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .business-description {
+    color: #374151;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .btn-view {
+    display: block;
+    padding: 10px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+  }
+
+  .btn-view:hover {
+    background: #1d4ed8;
+  }
+
+  .welcome-message {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .welcome-message h2 {
+    font-size: 32px;
+    color: #111827;
+    margin-bottom: 10px;
+  }
+
+  .welcome-message p {
+    font-size: 18px;
+    color: #6b7280;
+  }
