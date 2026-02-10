@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django import forms
 from django.utils import timezone
+from datetime import datetime
 from django.conf import settings
+from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
@@ -12,7 +15,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Business, Profile, Service, Review, TimeSlot, Booking
 from django.urls import reverse
 from django.views import View
+<<<<<<< HEAD
+from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm, BusinessEditForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .google_calendar import create_event_for_booking, update_event_for_booking, delete_event_for_booking
+import calendar
+=======
 from .forms import UserUpdateForm, ProfileUpdateForm, ProfileCreateForm, TimeSlotForm
+>>>>>>> 5555d6ab66ccf0e84e40e1cd4a3678a7be98095f
 
 # Create your views here.
 
@@ -135,7 +145,7 @@ class ProfileUpdateView(View):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect("/profile")  # change to your profile page
+            return redirect("/profile")
 
         return render(
             request,
@@ -313,6 +323,7 @@ class BookingCreate(CreateView):
         slot = self.get_slot()
         context['slot'] = slot
         context['business'] = slot.business
+        context['now'] = timezone.now()
         return context
 
 
@@ -350,25 +361,22 @@ class BookingCreate(CreateView):
 
 class BookingUpdate(UpdateView):
     model = Booking
-    fields = [""]
+    fields = ["status"]
     template_name="main_app/booking_form.html"
-
-    def get_queryset(self):
-        return Booking.objects.filter(client=self.request.user)
 
     def form_valid(self, form):
 
         response = super().form_valid(form)
 
         try:
-            create_event_for_booking(self.object)
+            update_event_for_booking(self.object)
         except Exception:
             pass
 
         return response
 
     def get_success_url(self):
-        return reverse("timeslot_list", kwargs={"pk": self.object.slot.business_id})
+        return reverse("business_dashboard")
 
 
 class BookingDelete(DeleteView):

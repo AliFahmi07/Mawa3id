@@ -1,11 +1,16 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Profile, TimeSlot
+from .models import Profile, TimeSlot, Business
 
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ["username", "email"]
+
+class BusinessEditForm(forms.ModelForm):
+        class Meta:
+            model = Business
+            fields = ["name", "description", "category"]
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
