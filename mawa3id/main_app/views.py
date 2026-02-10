@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.db.models import Avg
 from datetime import datetime
 from django.conf import settings
-from allauth.socialaccount.models import SocialAccount
+# from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
