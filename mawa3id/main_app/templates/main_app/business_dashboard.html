@@ -287,8 +287,23 @@
 {% endif %}
 
 
+<hr>
+<h2>Accepted Posts</h2>
 
-
+{% if accepted_posts %}
+  <ul>
+    {% for p in accepted_posts %}
+      <li>
+        <strong>User:</strong> {{ p.user.username }}<br>
+        <strong>Price:</strong> {{ p.price }}<br>
+        <strong>Description:</strong> {{ p.description }}
+      </li>
+      <hr>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No accepted posts yet.</p>
+{% endif %}
 
 
 
