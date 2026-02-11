@@ -55,14 +55,21 @@ This project was built as a **portfolio project to demonstrate full‑stack deve
 ---
 
 ## 📸 Screenshots
+###Business Owners Pages
+
+###Home Page
 ![business_home_page](https://i.postimg.cc/fbdV4Fts/image.png)
 ![business_home_page2](https://i.postimg.cc/x1wdPRsm/image.png)
 ![business_home_page3](https://i.postimg.cc/qqFrvJS6/image.png)
 ![business_home_page4](https://i.postimg.cc/JzVw62LV/image.png)
 ![business_home_page5](https://i.postimg.cc/rFWywWyw/image.png)
 ![business_home_page6](https://i.postimg.cc/MGsqFmt2/image.png)
+###Posts Page
 ![business_posts_page](https://i.postimg.cc/Mp5SnmCn/image.png)
+###Profile Page
 ![business_profile_page](https://i.postimg.cc/NMrSk6z1/image.png)
+
+###Client Pages
 
 ---
 
