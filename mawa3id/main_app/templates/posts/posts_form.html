@@ -1,23 +1,26 @@
 {% extends 'base.html' %}
-
 {% block content %}
 
-<div class="auth-container">
-    <div class="auth-card">
-        {% if object %}
-            <h1 class="auth-title">Edit Post</h1>
-        {% else %}
-            <h1 class="auth-title">Create New Post</h1>
-        {% endif %}
+<div class="form-page-container">
+  <div class="form-page-card">
+    {% if object %}
+      <h1 class="form-page-title">Update Post</h1>
+    {% else %}
+      <h1 class="form-page-title">Create Job Post</h1>
+    {% endif %}
 
-        <form action="" method="post" class="auth-form">
-            {% csrf_token %}
-            {{ form.as_p }}
-            
-            <input type="submit" value="Submit" class="btn primary-btn">
-            <a href="{% url 'posts_index' %}" class="btn cancel-btn">Cancel</a>
-        </form>
-    </div>
+    <form action="" method="post" class="auth-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+
+      <div class="form-actions">
+        <button type="submit" class="btn primary-btn">
+          {% if object %}Update{% else %}Create{% endif %} Post
+        </button>
+        <a href="{% url 'posts_index' %}" class="btn cancel-btn">Cancel</a>
+      </div>
+    </form>
+  </div>
 </div>
 
 {% endblock %}

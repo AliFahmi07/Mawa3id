@@ -3,10 +3,10 @@
 {% block content %}
 <div class="detail-container">
   <div class="detail-card">
-    <div class="detail-header">
+    <div class="post-header" style="padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
       <div>
         <h1 class="detail-title">Job Post</h1>
-        <p class="detail-author">Posted by: <strong>{{ posts.user.username }}</strong></p>
+        <p style="color: var(--gray-600); margin-top: 0.5rem;">Posted by: <strong>{{ posts.user.username }}</strong></p>
       </div>
       {% if posts.business %}
         <span class="post-status accepted">Accepted</span>
@@ -15,31 +15,29 @@
       {% endif %}
     </div>
 
-    <div class="detail-content">
-      <div class="detail-section">
-        <h3>Description</h3>
-        <p>{{ posts.description }}</p>
-      </div>
-
-      <div class="detail-section">
-        <h3>Price</h3>
-        <p class="detail-price">${{ posts.price }}</p>
-      </div>
-
-      {% if posts.business %}
-        <div class="detail-section accepted-info">
-          <h3>Status</h3>
-          <p>This job has been accepted by <strong>{{ posts.business.name }}</strong></p>
-        </div>
-      {% endif %}
+    <div style="margin-bottom: 2rem;">
+      <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--gray-900); margin-bottom: 1rem;">Description</h3>
+      <p style="color: var(--gray-700); line-height: 1.7;">{{ posts.description }}</p>
     </div>
 
-    <div class="detail-actions">
+    <div style="margin-bottom: 2rem;">
+      <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--gray-900); margin-bottom: 1rem;">Budget</h3>
+      <p class="post-price">${{ posts.price }}</p>
+    </div>
+
+    {% if posts.business %}
+      <div style="background: var(--info-light); padding: 1.5rem; border-radius: var(--radius-md); border-left: 4px solid var(--info); margin-bottom: 2rem;">
+        <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.5rem;">Status</h3>
+        <p style="color: var(--gray-700);">This job has been accepted by <strong>{{ posts.business.name }}</strong></p>
+      </div>
+    {% endif %}
+
+    <div class="form-actions">
       <a href="{% url 'posts_index' %}" class="btn cancel-btn">Back to Posts</a>
-      
+
       {% if posts.user == user and user.profile.role == 'client' %}
-        <a href="{% url 'posts_update' posts.id %}" class="btn primary-btn">Edit</a>
-        <a href="{% url 'posts_delete' posts.id %}" class="btn danger-btn">Delete</a>
+        <a href="{% url 'posts_update' posts.id %}" class="btn primary-btn">Edit Post</a>
+        <a href="{% url 'posts_delete' posts.id %}" class="btn danger-btn">Delete Post</a>
       {% elif user.profile.role == 'business_owner' and not posts.business %}
         <a href="{% url 'post_accept' posts.id %}" class="btn btn-accept">Accept Job</a>
       {% endif %}

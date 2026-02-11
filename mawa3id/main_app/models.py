@@ -166,7 +166,9 @@ class Review(models.Model):
         )
 
     def __str__(self):
-        return f"{self.user.username} - {self.rating} stars"
+        username = self.user.username if self.user else "Unknown user"
+        service_name = self.service.name if self.service else "Unknown service"
+        return f"{username} - {service_name} - {self.rating}"
 
 #===========================================================================================================
 
