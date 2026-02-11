@@ -1,6 +1,6 @@
 # Mawa3id — Appointment Booking Platform
 
-**Mawa3id** is a full-stack web application that allows clients to discover businesses, book appointments, and leave reviews, while business owners can manage services, availability, and customer bookings.  
+**Mawa3id** is a full-stack web application that allows clients to discover businesses, book appointments, and leave reviews, while business owners can manage services, availability, and customer bookings.
 This project was built as a **portfolio project to demonstrate full‑stack development skills with Django, databases, authentication, and real-world application design.**
 
 ---
@@ -36,21 +36,20 @@ This project was built as a **portfolio project to demonstrate full‑stack deve
 
 ## 🛠️ Tech Stack
 
-**Backend**  
+**Backend**
 - Python 3
 - Django 6
 - Django ORM
 
-**Frontend**  
-- HTML5, CSS3, JavaScript  
+**Frontend**
+- HTML5, CSS3
 - Django Templates
 
-**Database**  
-- PostgreSQL (Production)  
-- SQLite (Development)
+**Database**
+- PostgreSQL
 
-**Tools & Workflow**  
-- Git & GitHub (Team collaboration, branching, PRs)  
+**Tools & Workflow**
+- Git & GitHub (Team collaboration, branching, PRs)
 - Environment variables with `.env`
 
 ---
@@ -70,9 +69,7 @@ cd Mawa3id
 
 ### 2️⃣ Create a Virtual Environment
 ```bash
-python -m venv venv
-source venv/bin/activate   # macOS/Linux
-venv\Scripts\activate      # Windows
+pipenv shell
 ```
 
 ### 3️⃣ Install Dependencies
@@ -83,9 +80,10 @@ pip install -r requirements.txt
 ### 4️⃣ Environment Variables
 Create a `.env` file in the root directory:
 ```env
-DEBUG=True
-SECRET_KEY=your_secret_key
-DATABASE_URL=your_database_url
+DB_NAME="YOUR_DATABASE_NAME"
+DB_USERNAME="YOUR_USER_NAME"
+DB_PASSWORD="YOUR_PASSWORD"
+DB_PORT="YOUR_DATABASE_PORT"
 ```
 
 ---
@@ -170,10 +168,19 @@ git commit
 
 ---
 
-## 👨‍💻 Author
+## 👨‍💻 Team members
 
-**Ali Shamlooh**  
-Software Engineer | Django Developer  
+**Ali Shamlooh**
+Software Engineer | Django Developer
+> Add your LinkedIn / GitHub profile link here
+**Ali Shamlooh**
+Software Engineer | Django Developer
+> Add your LinkedIn / GitHub profile link here
+**Ali Shamlooh**
+Software Engineer | Django Developer
+> Add your LinkedIn / GitHub profile link here
+**Ali Shamlooh**
+Software Engineer | Django Developer
 > Add your LinkedIn / GitHub profile link here
 
 ---
