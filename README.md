@@ -55,7 +55,14 @@ This project was built as a **portfolio project to demonstrate full‑stack deve
 ---
 
 ## 📸 Screenshots
-> _Add screenshots of your app here (home page, dashboard, booking flow)_
+![business_home_page](https://i.postimg.cc/fbdV4Fts/image.png)
+![business_home_page2](https://i.postimg.cc/x1wdPRsm/image.png)
+![business_home_page3](https://i.postimg.cc/qqFrvJS6/image.png)
+![business_home_page4](https://i.postimg.cc/JzVw62LV/image.png)
+![business_home_page5](https://i.postimg.cc/rFWywWyw/image.png)
+![business_home_page6](https://i.postimg.cc/MGsqFmt2/image.png)
+![business_posts_page](https://i.postimg.cc/Mp5SnmCn/image.png)
+![business_profile_page](https://i.postimg.cc/NMrSk6z1/image.png)
 
 ---
 
@@ -171,17 +178,17 @@ git commit
 ## 👨‍💻 Team members
 
 **Ali Shamlooh**
-Software Engineer | Full Stack Developer
-[GitHub Profile](https://github.com/Ali19Shamlooh)
+Software Engineer | Full Stack Developer |
+[GitHub Profile](https://github.com/Ali19Shamlooh)<br>
 **Ali Fahmi**
-Software Engineer | Full Stack Developer
-[GitHub Profile](https://github.com/AliFahmi07)
+Software Engineer | Full Stack Developer |
+[GitHub Profile](https://github.com/AliFahmi07)<br>
 **Ammar Shabib**
-Software Engineer | Full Stack Developer
-[GitHub Profile](https://github.com/ammarys-w)
+Software Engineer | Full Stack Developer |
+[GitHub Profile](https://github.com/ammarys-w)<br>
 **Abdulla Khamis**
-Software Engineer | Full Stack Developer
-[GitHub Profile](https://github.com/3bdulla03)
+Software Engineer | Full Stack Developer |
+[GitHub Profile](https://github.com/3bdulla03)<br>
 
 ---
 
