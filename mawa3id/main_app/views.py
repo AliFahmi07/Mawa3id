@@ -27,24 +27,23 @@ import calendar
 #Registration
 
 def home(request):
+    context = {}
     businesses = Business.objects.all().order_by("category", "name")
-
     # Don't show buzznes to business owners
-    if request.user.is_authenticated and request.user.profile.role == Profile.Role.BUSINESS_OWNER:
-        businesses = Business.objects.none()
+    if request.user.is_authenticated:
+        role = 'businessOwner' if request.user.profile.role == Profile.Role.BUSINESS_OWNER else 'client'
+        if role == 'businessOwner':
+            return redirect("business_dashboard")
+        else:
+            selected_category = request.GET.get("category")
+            businesses = businesses.filter(category=selected_category)
 
-    selected_category = request.GET.get("category")
-
-    if selected_category:
-        businesses = businesses.filter(category=selected_category)
-
-    context = {
-        "businesses": businesses,
-        "categories": Business.Category.choices,
-        "selected_category": selected_category,
-    }
-
-    return render(request, "home.html", context)
+            context = {
+                "businesses": businesses,
+                "categories": Business.Category.choices,
+            }
+    else:
+        return render(request, "home.html", context)
 
 def signup(request):
     error_message = ""
