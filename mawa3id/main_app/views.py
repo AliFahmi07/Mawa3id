@@ -159,11 +159,11 @@ class ProfileUpdateView(LoginRequiredMixin, View):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect("/profile")
+            return redirect("profile_detail")
 
         return render(
             request,
-            "profile_update.html",
+            "main_app/profile_update.html",
             {"user_form": user_form, "profile_form": profile_form},
         )
 
