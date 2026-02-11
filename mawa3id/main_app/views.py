@@ -44,6 +44,7 @@ def home(request):
             }
     else:
         return render(request, "home.html", context)
+    return render(request, "home.html", context)
 
 def signup(request):
     error_message = ""
