@@ -4,6 +4,10 @@
 <h1>{{ business.name }} — Slots</h1>
 
 <p>
+  <a href="{% url 'timeslot_create' pk=business.id %}">+ Add Slot</a>
+  |
+  <a href="{% url 'business_detail' pk=business.id %}">Back to Business</a>
+  |
   {% if request.user == business.owner %}
     <a href="{% url 'timeslot_create' pk=business.id %}">+ Add Slot</a>
   {% endif %}

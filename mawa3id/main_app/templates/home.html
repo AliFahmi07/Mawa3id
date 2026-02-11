@@ -2,11 +2,24 @@
 {%block content%}
 
 {% if user.is_authenticated %}
-  {% if businesses %}
-    {% load static %}
+  {% if user_role == "client" %}
+    <div class="category-filter-container">
+  <h1>Businesses</h1>
+
+  <form method="GET" class="category-filter">
+    <select name="category" onchange="this.form.submit()">
+      <option value="">All Categories</option>
+      {% for value, label in categories %}
+        <option value="{{ value }}"
+          {% if selected_category == value %}selected{% endif %}>
+          {{ label }}
+        </option>
+      {% endfor %}
+    </select>
+  </form>
+</div>
     <div class="business-container">
       <div class="business-header">
-        <h1>All Businesses</h1>
       </div>
 
       <div class="business-grid">
@@ -14,6 +27,7 @@
         <div class="business-card">
           <div class="business-image">
             <a href="{% url 'business_detail' pk=buiz.id %}">
+              {% load static %}
               <img src="{% static buiz.owner.profile.image|cut:'main_app/static/' %}" alt="{{ buiz.name }}">
             </a>
           </div>
@@ -46,7 +60,10 @@
   {% endif %}
 
 {% else %}
-  <h2>Welcome to Mawa3id</h2>
+  <div class="welcome-guest-container">
+    <h2 class="welcome-guest">Welcome to Mawa3id</h2>
+    <p class="welcome-guest-subtitle">Discover amazing businesses and services near you.</p>
+  </div>
 {% endif %}
 
 {%endblock%}

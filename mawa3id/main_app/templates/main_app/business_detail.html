@@ -140,5 +140,52 @@
       <a href="{% url 'business_create' %}" class="btn-create">Create Business</a>
     </div>
   {% endif %}
+
+  <!-- SERVICES -->
+  <h2>Services</h2>
+
+  {% if services %}
+    {% for service in services %}
+      <div class="service-card">
+        <h3>{{ service.name }}</h3>
+        <p>{{ service.description }}</p>
+        <p>${{ service.price }} | {{ service.time }} mins</p>
+
+        {% if user == business.owner %}
+          <a href="{% url 'service_update' pk=business.id service_id=service.id %}">Edit Service</a>
+        {% endif %}
+
+        <!-- REVIEWS -->
+        <h4>Reviews ({{ service.reviews.count }})</h4>
+
+        {% if service.reviews.all %}
+          {% for review in service.reviews.all %}
+            <div class="review-item">
+              <strong>{{ review.user.username }}</strong> - {{ review.rating }} ★
+              <p>{{ review.text }}</p>
+
+              {% if user == review.user %}
+                <a href="{% url 'review_update' review.id %}">Edit</a>
+                <a href="{% url 'review_delete' review.id %}">Delete</a>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% else %}
+          <p>No reviews yet.</p>
+        {% endif %}
+
+        {% if user.is_authenticated and user.profile.role == "client" %}
+          <a href="{% url 'review_create' service.id %}">Write Review</a>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No services yet.</p>
+  {% endif %}
+
+{% else %}
+  <a href="{% url 'business_create' %}">Create Business</a>
+{% endif %}
+
 </div>
-{% endblock content %}
+{% endblock %}
