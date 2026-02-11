@@ -82,6 +82,7 @@ def signup(request):
         "registration/signup.html", context
     )
 
+@login_required
 def posts_index(request):
     user_profile = request.user.profile
 
@@ -92,6 +93,7 @@ def posts_index(request):
 
     return render(request, 'posts/index.html', {'posts': posts})
 
+@login_required
 def posts_detail(request, posts_id):
     posts = Posts.objects.get(id=posts_id)
     return render(request, 'posts/detail.html', {'posts': posts})
