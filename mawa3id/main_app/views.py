@@ -36,11 +36,14 @@ def home(request):
             return redirect("business_dashboard")
         else:
             selected_category = request.GET.get("category")
-            businesses = businesses.filter(category=selected_category)
+
+            if selected_category:
+                businesses = businesses.filter(category=selected_category)
 
             context = {
                 "businesses": businesses,
                 "categories": Business.Category.choices,
+                "selected_category": selected_category,
             }
     else:
         return render(request, "home.html", context)
@@ -156,11 +159,11 @@ class ProfileUpdateView(LoginRequiredMixin, View):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect("/profile")
+            return redirect("profile_detail")
 
         return render(
             request,
-            "profile_update.html",
+            "main_app/profile_update.html",
             {"user_form": user_form, "profile_form": profile_form},
         )
 
@@ -457,6 +460,13 @@ class BusinessList(ListView):
 class TimeSlotCreate(LoginRequiredMixin, CreateView):
     model = TimeSlot
     form_class = TimeSlotForm
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        business_id = self.kwargs.get('pk')
+
+    # Filter the service field's queryset
+        form.fields['service'].queryset = Service.objects.filter(business_id=business_id)
+        return form
 
     def form_valid(self, form):
         business = get_object_or_404(Business, pk=self.kwargs['pk'])

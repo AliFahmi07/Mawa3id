@@ -10,16 +10,17 @@
         <h1>All Businesses</h1>
 
         <form method="GET" class="category-filter">
-          <select name="category" onchange="this.form.submit()">
-            <option value="">Filter By Category</option>
+  <select name="category" onchange="this.form.submit()">
+    <option value="">All Categories</option>
 
-            {% for value, label in categories %}
-              <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>
-                {{ label }}
-              </option>
-            {% endfor %}
-          </select>
-        </form>
+    {% for value, label in categories %}
+      <option value="{{ value }}"
+        {% if selected_category == value %}selected{% endif %}>
+        {{ label }}
+      </option>
+    {% endfor %}
+  </select>
+</form>
       </div>
 
       <div class="business-grid">
