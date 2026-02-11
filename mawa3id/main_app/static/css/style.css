@@ -1347,17 +1347,50 @@ nav button:active {
 .p-3 { padding: var(--spacing-lg); }
 
 
-/* NEW: brand logo in navbar */
-.nav-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
+/* Home: Category filter */
+.category-filter {
+  max-width: 420px;
+  margin: 16px 0 24px;
 }
 
-.nav-logo {
-  width: 34px;
-  height: 34px;
-  object-fit: cover;
-  border-radius: 8px;
+.category-filter select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+
+  background: #EEEEEE;
+  color: #222831;
+
+  border: 1px solid rgba(57, 62, 70, 0.35);
+  outline: none;
+
+  font: inherit;
+  cursor: pointer;
+}
+
+.category-filter select:focus {
+  border-color: #00ADB5;
+  box-shadow: 0 0 0 3px rgba(0, 173, 181, 0.20);
+}
+
+.category-filter select:hover {
+  border-color: rgba(0, 173, 181, 0.55);
+}
+
+.category-filter option {
+  color: #222831;
+}
+
+/* Home: place filter within the All Businesses header */
+.business-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.business-header .category-filter {
+  margin: 0;
+  max-width: 280px;
+  width: 100%;
 }
