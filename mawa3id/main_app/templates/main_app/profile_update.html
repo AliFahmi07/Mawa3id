@@ -1,41 +1,20 @@
-{% extends "base.html" %}
-
+{% extends 'base.html' %}
 {% block content %}
-<div class="form-container">
-  <div class="form-card">
-    <h1 class="form-title">Edit Profile</h1>
-    
-    <form method="POST" enctype="multipart/form-data" class="styled-form">
+
+<div class="form-page-container">
+  <div class="form-page-card">
+    <h1 class="form-page-title">Update Profile</h1>
+
+    <form action="" method="post" enctype="multipart/form-data" class="auth-form">
       {% csrf_token %}
-
-      <div class="form-section">
-        <h3 class="section-heading">User Information</h3>
-        {{ user_form.as_p }}
-      </div>
-
-      <div class="form-section">
-        <h3 class="section-heading">Profile Image</h3>
-        
-        <div class="image-upload-section">
-          <div class="current-image">
-            <label class="image-label">Current Image:</label>
-            {% load static%}
-            <img src="{% static profile_form.instance.image|cut:'main_app/static/' %}"
-              alt="Profile photo" class="preview-image" />
-          </div>
-          
-          <div class="file-input-wrapper">
-            <label for="id_image" class="file-label">Change Image</label>
-            <input type="file" name="image" accept="image/*" id="id_image" class="file-input">
-          </div>
-        </div>
-      </div>
+      {{ form.as_p }}
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a href="{% url 'profile_detail' %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn primary-btn">Update Profile</button>
+        <a href="{% url 'profile_detail' %}" class="btn cancel-btn">Cancel</a>
       </div>
     </form>
   </div>
 </div>
-{% endblock content %}
+
+{% endblock %}

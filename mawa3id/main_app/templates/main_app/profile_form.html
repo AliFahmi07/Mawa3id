@@ -1,11 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>create profile</h1>
-<form action="" method='post' enctype='multipart/form-data'>
-  {% csrf_token %}
-    <table>
-      {{form.as_table}}
-    </table>
-    <input type="submit" value="submit" class="btn"/>
-</form>
+
+<div class="form-page-container">
+  <div class="form-page-card">
+    <h1 class="form-page-title">Create Profile</h1>
+
+    <form action="" method="post" enctype="multipart/form-data" class="auth-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+
+      <div class="form-actions">
+        <button type="submit" class="btn primary-btn">Create Profile</button>
+        <a href="{% url 'home' %}" class="btn cancel-btn">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% endblock %}

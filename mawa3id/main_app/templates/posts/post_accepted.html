@@ -1,15 +1,72 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="card">
-  <div class="card-content">
-    <h2>Job Accepted</h2>
-    <p>You accepted the post from <strong>{{ post.user }}</strong>.</p>
-    <p><strong>Description:</strong> {{ post.description }}</p>
-    <p><strong>Price:</strong> ${{ post.price }}</p>
+<div class="posts-container">
+  <div class="posts-header">
+    <h1>Post Accepted</h1>
+    <p>Your business has accepted this post.</p>
   </div>
-  <div class="card-action">
-    <a href="{% url 'posts_index' %}">Back to Posts</a>
-  </div>
+
+  {% if post %}
+    <div class="posts-grid">
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-author">
+            <strong>Posted by:</strong>
+            {% if post.user %}{{ post.user.username }}{% else %}—{% endif %}
+          </div>
+
+          {% if post.business %}
+            <div class="post-business">
+              <strong>Accepted by:</strong> {{ post.business.name }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="post-content">
+          {% if post.title %}
+            <div class="post-title">
+              <strong>Title:</strong> {{ post.title }}
+            </div>
+          {% endif %}
+
+          {% if post.description %}
+            <div class="post-description">
+              <strong>Description:</strong> {{ post.description }}
+            </div>
+          {% endif %}
+
+          {% if post.price %}
+            <div class="post-price">
+              <strong>Price:</strong> {{ post.price }}
+            </div>
+          {% endif %}
+
+          {% if post.service %}
+            <div class="post-service">
+              <strong>Service:</strong> {{ post.service.name }}
+            </div>
+          {% endif %}
+
+          {% if post.status %}
+            <div class="post-status">
+              <strong>Status:</strong> {{ post.status }}
+            </div>
+          {% else %}
+            <div class="post-status">
+              <strong>Status:</strong> Accepted
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="post-actions">
+          <a href="{% url 'posts_index' %}">Return to Posts</a>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <p>Post not found.</p>
+    <p><a href="{% url 'posts_index' %}">Return to Posts</a></p>
+  {% endif %}
 </div>
 {% endblock %}

@@ -6,27 +6,32 @@
     <!-- Business Info Card -->
     <div class="detail-header-card">
       <div class="detail-header-content">
-{% if object %}
-<h1>Business</h1>
-<div>
-    <div>
-        <span>name:{{ business.name }}</span><br>
-        <span>category:{{ business.category }}</span><br>
-        <span>description:{{ business.description }}</span>
-        {% if user == business.owner %}
+
+        <h1>Business</h1>
+
         <div>
-          <h1 class="detail-title">{{ business.name }}</h1>
-          <span class="detail-category">{{ business.category }}</span>
-          <p class="detail-description">{{ business.description }}</p>
+          <div>
+            <span>name:{{ business.name }}</span><br>
+            <span>category:{{ business.category }}</span><br>
+            <span>description:{{ business.description }}</span>
+
+            {% if user == business.owner %}
+            <div>
+              <h1 class="detail-title">{{ business.name }}</h1>
+              <span class="detail-category">{{ business.category }}</span>
+              <p class="detail-description">{{ business.description }}</p>
+            </div>
+
+            <div class="detail-actions">
+              <a href="{% url 'business_update' business.id %}" class="btn-edit">Edit Business</a>
+              <a href="{% url 'service_create' pk=business.id %}" class="btn-add">Add Service</a>
+              <a href="{% url 'timeslot_create' pk=object.id %}" class="btn-add">Add Time Slot</a>
+            </div>
+            {% endif %}
+
+          </div>
         </div>
 
-        {% if user == business.owner %}
-        <div class="detail-actions">
-          <a href="{% url 'business_update' business.id %}" class="btn-edit">Edit Business</a>
-          <a href="{% url 'service_create' pk=business.id %}" class="btn-add">Add Service</a>
-          <a href="{% url 'timeslot_create' pk=object.id %}" class="btn-add">Add Time Slot</a>
-        </div>
-        {% endif %}
       </div>
     </div>
 
@@ -53,6 +58,13 @@
         <div class="service-owner-actions">
           <a href="{% url 'service_update' pk=business.id service_id=service.id %}" class="btn-link">Edit Service</a>
         </div>
+        {% endif %}
+
+        <!-- Client booking entry point (filters slots by service) -->
+        {% if user.is_authenticated and user != business.owner %}
+          <div>
+            <a href="?service={{ service.id }}">Book this service</a>
+          </div>
         {% endif %}
 
         <!-- Reviews Section -->
@@ -92,6 +104,35 @@
       {% endfor %}
     {% else %}
       <p class="no-services">No services available yet</p>
+    {% endif %}
+
+    <!-- Booking / Slots Section -->
+    <div class="section-header">
+      <h2>Available Slots</h2>
+    </div>
+
+    {% if user.is_authenticated and user != business.owner %}
+      {% if service_id %}
+        <p>Showing slots for selected service. <a href="{% url 'business_detail' pk=business.id %}">Show all services</a></p>
+      {% endif %}
+
+      {% if slots %}
+        <ul>
+          {% for slot in slots %}
+            <li>
+              <div><strong>Start:</strong> {{ slot.start }}</div>
+              <div><strong>Duration:</strong> {{ slot.duration }} mins</div>
+              <div><strong>Service:</strong> {% if slot.service %}{{ slot.service.name }}{% else %}—{% endif %}</div>
+              <div>
+                <a href="{% url 'booking_create' pk=slot.id %}">Book</a>
+              </div>
+            </li>
+            <hr>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No available slots right now.</p>
+      {% endif %}
     {% endif %}
 
   {% else %}

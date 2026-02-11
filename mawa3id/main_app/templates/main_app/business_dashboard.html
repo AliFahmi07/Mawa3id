@@ -1,143 +1,373 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>Business Dashboard</h1>
+<div class="dashboard-container">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <h1>Business Dashboard</h1>
+    <p>Manage your business, services, and bookings</p>
+  </div>
 
-<table>
-  <tr>
-    <!-- LEFT -->
-    <td>
-<h2>Business Details</h2>
+  <!-- Business Details Section -->
+  <div class="dashboard-card">
+    <h2>Business Details</h2>
 
-{% if request.GET.edit %}
-  <form method="post" action="{% url 'business_dashboard' %}">
-    {% csrf_token %}
-    {{ business_form.as_p }}
-    <button type="submit">Save</button>
-    <a href="{% url 'business_dashboard' %}">Cancel</a>
-  </form>
-{% else %}
-  <p><strong>Name:</strong> {{ business.name }}</p>
-  <p><strong>Description:</strong> {{ business.description }}</p>
-  <p><strong>Category:</strong> {{ business.category }}</p>
+    {% if edit_mode %}
+      <form method="post" class="auth-form">
+        {% csrf_token %}
+        {{ business_form.as_p }}
+        <div class="form-actions">
+          <button type="submit" class="btn primary-btn">Save Changes</button>
+          <a href="{% url 'business_dashboard' %}" class="btn cancel-btn">Cancel</a>
+        </div>
+      </form>
+    {% else %}
+      <div class="detail-row">
+        <span class="detail-label">Name:</span>
+        <span class="detail-value">{{ business.name }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Category:</span>
+        <span class="detail-value">{{ business.category }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Description:</span>
+        <span class="detail-value">{{ business.description }}</span>
+      </div>
+      <a href="{% url 'business_dashboard' %}?edit=1" class="btn primary-btn" style="margin-top: 1rem;">Edit Business</a>
+    {% endif %}
+  </div>
 
-  <a href="{% url 'business_dashboard' %}?edit=1">Edit</a>
-{% endif %}
-    </td>
+  <!-- Services Section -->
+  <div class="dashboard-card">
+    <h2>Services</h2>
+    <a href="{% url 'service_create' pk=business.id %}" class="btn btn-add" style="margin-bottom: 1.5rem;">Add New Service</a>
 
-    <!-- RIGHT -->
-
-    <td>
-    {% if has_google and calendar_src %}
-      <h2>Bookings Calendar ({{ month }}/{{ year }})</h2>
-  <iframe
-    src="https://calendar.google.com/calendar/embed?src={{ calendar_src|urlencode }}&ctz={{ calendar_tz|urlencode }}"
-    width="800"
-    height="600"
-    frameborder="0"
-    scrolling="no">
-  </iframe>
-
-
-  {% if bookings %}
-    <ul>
-      {% for b in bookings %}
-        <li>
-          <div><strong>Date/Time:</strong> {% load tz %} {{ b.slot.start|localtime|date:"Y-m-d H:i" }}</div>
-
-          <div><strong>Client:</strong>
-            {% if b.client %}{{ b.client.username }}{% else %}—{% endif %}
+    {% if services %}
+      <div class="reviews-list">
+        {% for s in services %}
+        <div class="service-card">
+          <div class="service-header">
+            <div>
+              <h3 class="service-name">{{ s.name }}</h3>
+              <p class="service-description">{{ s.description }}</p>
+            </div>
+            <div class="service-meta">
+              <span class="service-price">${{ s.price }}</span>
+              <span class="service-duration">{{ s.time }} mins</span>
+            </div>
           </div>
 
-          <div><strong>Service:</strong>
-            {% if b.slot.service %}{{ b.slot.service.name }}{% else %}—{% endif %}
-          </div>
-
-          <div><strong>Status:</strong> {{ b.status }}</div>
-
-          <div>
-                  <form method="post" action="{% url 'booking_status_update' pk=b.id %}">
-                    {% csrf_token %}
-                    <select name="status">
-                      {% for value, label in b.Status.choices %}
-                        <option value="{{ value }}" {% if b.status == value %}selected{% endif %}>
-                          {{ label }}
-                        </option>
-                      {% endfor %}
-                    </select>
-                    <button type="submit">Update</button>
-                  </form>
-          </div>
-        </li>
-        <hr>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No bookings yet.</p>
-  {% endif %}
-
-{% else %}
-
-  <h2>Bookings Calendar ({{ month }}/{{ year }})</h2>
-
-  <p>
-    <a href="?year={{ year }}&month={{ month|add:'-1' }}">Prev</a>
-    |
-    <a href="?year={{ year }}&month={{ month|add:'1' }}">Next</a>
-  </p>
-
-  <table border="1">
-    <tr>
-      <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th>
-    </tr>
-
-    {% for week in weeks %}
-      <tr>
-        {% for cell in week %}
-          <td>
-            {% if cell.day %}
-              <strong>{{ cell.day }}</strong>
-              <ul>
-                {% for b in cell.bookings %}
-                  <li>
-                    {% load tz %}
-                    {{ b.slot.start|localtime|date:"Y-m-d H:i" }}
-                    —
-                    {% if b.client %}{{ b.client.username }}{% else %}Client{% endif %}
-                    —
-                    {{b.status}}
-                  <form method="post" action="{% url 'booking_status_update' pk=b.id %}">
-                    {% csrf_token %}
-                    <select name="status">
-                      {% for value, label in b.Status.choices %}
-                        <option value="{{ value }}" {% if b.status == value %}selected{% endif %}>
-                          {{ label }}
-                        </option>
-                      {% endfor %}
-                    </select>
-                    <button type="submit">Update</button>
-                  </form>
-                  </li>
-                {% endfor %}
-              </ul>
-            {% endif %}
-          </td>
+          {% if edit_service_id == s.id %}
+            <form method="post" action="{% url 'service_update' pk=s.id service_id=s.id %}" class="auth-form">
+              {% csrf_token %}
+              <p>
+                <label>Name:</label>
+                <input type="text" name="name" value="{{ s.name }}">
+              </p>
+              <p>
+                <label>Description:</label>
+                <textarea name="description" rows="3">{{ s.description }}</textarea>
+              </p>
+              <p>
+                <label>Duration (minutes):</label>
+                <input type="number" name="time" value="{{ s.time }}">
+              </p>
+              <p>
+                <label>Price ($):</label>
+                <input type="number" name="price" value="{{ s.price }}" step="0.01">
+              </p>
+              <div class="form-actions">
+                <button type="submit" class="btn primary-btn">Save</button>
+                <a href="{% url 'business_dashboard' %}" class="btn cancel-btn">Cancel</a>
+              </div>
+            </form>
+          {% else %}
+            <div class="review-actions">
+              <a href="{% url 'business_dashboard' %}?edit_service={{ s.id }}" class="btn-small">Edit</a>
+              <a href="{% url 'service_delete' pk=s.id service_id=s.id %}" class="btn-small-red">Delete</a>
+            </div>
+          {% endif %}
+        </div>
         {% endfor %}
-      </tr>
-    {% endfor %}
-  </table>
+      </div>
+    {% else %}
+      <p class="no-services">No services yet. Add your first service to get started!</p>
+    {% endif %}
+  </div>
 
+  <!-- Calendar/Bookings Section -->
+  <div class="dashboard-card">
+    <h2>Bookings Calendar - {{ month }}/{{ year }}</h2>
 
+    {% if has_google and calendar_src %}
+      <iframe
+        src="https://calendar.google.com/calendar/embed?src={{ calendar_src|urlencode }}&ctz={{ calendar_tz|urlencode }}"
+        width="100%"
+        height="600"
+        frameborder="0"
+        scrolling="no"
+        style="border-radius: 0.5rem; margin-bottom: 1.5rem;">
+      </iframe>
 
+      {% if bookings %}
+        <h3 style="margin-bottom: 1rem; font-size: 1.25rem; color: var(--gray-900);">Booking Details</h3>
+        <div class="reviews-list">
+          {% for b in bookings %}
+          <div class="review-item">
+            <div class="detail-row">
+              <span class="detail-label">Date/Time:</span>
+              <span class="detail-value">{% load tz %}{{ b.slot.start|localtime|date:"Y-m-d H:i" }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Client:</span>
+              <span class="detail-value">{% if b.client %}{{ b.client.username }}{% else %}—{% endif %}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Service:</span>
+              <span class="detail-value">{% if b.slot.service %}{{ b.slot.service.name }}{% else %}—{% endif %}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Status:</span>
+              <span class="detail-value">{{ b.status }}</span>
+            </div>
 
+            <form method="post" action="{% url 'booking_status_update' pk=b.id %}" style="margin-top: 1rem;">
+              {% csrf_token %}
+              <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Update Status:</label>
+              <div style="display: flex; gap: 0.5rem;">
+                <select name="status" style="flex: 1; padding: 0.5rem; border-radius: 0.375rem; border: 2px solid var(--gray-200);">
+                  {% for value, label in b.Status.choices %}
+                    <option value="{{ value }}" {% if b.status == value %}selected{% endif %}>
+                      {{ label }}
+                    </option>
+                  {% endfor %}
+                </select>
+                <button type="submit" class="btn primary-btn" style="width: auto; margin: 0;">Update</button>
+              </div>
+            </form>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="no-reviews">No bookings yet.</p>
+      {% endif %}
 
+    {% else %}
+      <!-- Manual Calendar -->
+      <div style="margin-bottom: 1.5rem; text-align: center;">
+        <a href="?year={{ year }}&month={{ month|add:'-1' }}" class="btn-link" style="display: inline-block; margin: 0 0.5rem;">← Previous Month</a>
+        <a href="?year={{ year }}&month={{ month|add:'1' }}" class="btn-link" style="display: inline-block; margin: 0 0.5rem;">Next Month →</a>
+      </div>
 
+      <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 0.5rem; overflow: hidden;">
+        <thead>
+          <tr style="background: var(--gray-100);">
+            <th style="padding: 1rem; border: 1px solid var(--gray-200);">Mon</th>
+            <th style="padding: 1rem; border: 1px solid var(--gray-200);">Tue</th>
+            <th style="padding: 1rem; border: 1px solid var(--gray-200);">Wed</th>
+            <th style="padding: 1rem; border: 1px solid var(--gray-200);">Thu</th>
+            <th style="padding: 1rem; border: 1px solid var(--gray-200);">Fri</th>
+            <th style="padding: 1rem; border: 1px solid var(--gray-200);">Sat</th>
+            <th style="padding: 1rem; border: 1px solid var(--gray-200);">Sun</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for week in weeks %}
+          <tr>
+            {% for cell in week %}
+            <td style="padding: 0.75rem; border: 1px solid var(--gray-200); vertical-align: top; height: 100px;">
+              {% if cell.day %}
+                <strong style="color: var(--gray-900);">{{ cell.day }}</strong>
+                <ul style="list-style: none; padding: 0; margin-top: 0.5rem; font-size: 0.75rem;">
+                  {% for b in cell.bookings %}
+                  <li style="margin-bottom: 0.5rem; padding: 0.25rem; background: var(--info-light); border-radius: 0.25rem;">
+                    {% load tz %}
+                    {{ b.slot.start|localtime|date:"H:i" }} -
+                    {% if b.client %}{{ b.client.username }}{% else %}Client{% endif %}
+                    <form method="post" action="{% url 'booking_status_update' pk=b.id %}" style="margin-top: 0.25rem;">
+                      {% csrf_token %}
+                      <select name="status" style="width: 100%; font-size: 0.75rem; padding: 0.25rem;">
+                        {% for value, label in b.Status.choices %}
+                          <option value="{{ value }}" {% if b.status == value %}selected{% endif %}>
+                            {{ label }}
+                          </option>
+                        {% endfor %}
+                      </select>
+                      <button type="submit" style="width: 100%; margin-top: 0.25rem; padding: 0.25rem; font-size: 0.7rem; background: var(--primary); color: white; border: none; border-radius: 0.25rem; cursor: pointer;">Update</button>
+                    </form>
+                  </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
 
+  <!-- Time Slots Section -->
+  <div class="dashboard-card">
+    <h2>Time Slots</h2>
 
+    {% if request.user == business.owner %}
+      <a href="{% url 'timeslot_create' pk=business.id %}" class="btn btn-add" style="margin-bottom: 1.5rem;">Add New Slot</a>
+    {% endif %}
 
+    {% if slots %}
+      <div class="reviews-list">
+        {% for slot in slots %}
+        <div class="review-item">
+          {% if edit_slot_id == slot.id and request.user == business.owner %}
+            <form method="post" action="{% url 'timeslot_update' pk=slot.id %}" class="auth-form">
+              {% csrf_token %}
+              <p>
+                <label>Service:</label>
+                <select name="service">
+                  <option value="">No specific service</option>
+                  {% for s in services %}
+                    <option value="{{ s.id }}" {% if slot.service_id == s.id %}selected{% endif %}>
+                      {{ s.name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </p>
+              <p>
+                <label>Start Time:</label>
+                <input type="datetime-local" name="start" value="{{ slot.start|date:'Y-m-d\TH:i' }}">
+              </p>
+              <p>
+                <label>Duration (minutes):</label>
+                <input type="number" name="duration" value="{{ slot.duration }}">
+              </p>
+              <p>
+                <label>
+                  <input type="checkbox" name="is_active" {% if slot.is_active %}checked{% endif %}>
+                  Active
+                </label>
+              </p>
+              <div class="form-actions">
+                <button type="submit" class="btn primary-btn">Save</button>
+                <a href="{% url 'business_dashboard' %}" class="btn cancel-btn">Cancel</a>
+              </div>
+            </form>
+          {% else %}
+            <div class="detail-row">
+              <span class="detail-label">Start:</span>
+              <span class="detail-value">{{ slot.start }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Duration:</span>
+              <span class="detail-value">{{ slot.duration }} minutes</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Service:</span>
+              <span class="detail-value">{% if slot.service %}{{ slot.service.name }}{% else %}Any service{% endif %}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Status:</span>
+              <span class="detail-value">
+                {% if slot.is_active %}
+                  <span class="post-status available">Active</span>
+                {% else %}
+                  <span class="post-status">Inactive</span>
+                {% endif %}
+              </span>
+            </div>
 
+            {% if slot.booking %}
+              <div class="detail-row">
+                <span class="detail-label">Booked by:</span>
+                <span class="detail-value">{{ slot.booking.client.username }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Booking Status:</span>
+                <span class="detail-value">{{ slot.booking.status }}</span>
+              </div>
+            {% endif %}
 
+            {% if request.user == business.owner %}
+              <div class="review-actions" style="margin-top: 1rem;">
+                <a href="{% url 'business_dashboard' %}?edit_slot={{ slot.id }}" class="btn-small">Edit Slot</a>
+                <a href="{% url 'timeslot_delete' pk=slot.id %}" class="btn-small-red">Delete Slot</a>
+              </div>
+            {% endif %}
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="no-services">No time slots yet. Add slots for clients to book!</p>
+    {% endif %}
+  </div>
 
-{% endif %}
+  <!-- Reviews Section -->
+  <div class="dashboard-card">
+    <h2>Customer Reviews</h2>
+
+    <div class="detail-row" style="margin-bottom: 1.5rem;">
+      <span class="detail-label">Average Rating:</span>
+      <span class="detail-value">
+        {% if avg_rating %}
+          <span class="review-rating">{{ avg_rating|floatformat:1 }} ★</span>
+        {% else %}
+          No ratings yet
+        {% endif %}
+      </span>
+    </div>
+
+    {% if reviews %}
+      <div class="reviews-list">
+        {% for r in reviews %}
+        <div class="review-item">
+          <div class="review-header">
+            <span class="review-author">{{ r.user.username }}</span>
+            <span class="review-rating">{{ r.rating }} ★</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Service:</span>
+            <span class="detail-value">{{ r.service.name }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Date:</span>
+            <span class="detail-value">{{ r.created_at|date:"M d, Y" }}</span>
+          </div>
+          <p class="review-text">{{ r.text }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="no-reviews">No reviews yet.</p>
+    {% endif %}
+  </div>
+
+  <!-- Accepted Posts Section -->
+  <div class="dashboard-card">
+    <h2>Accepted Posts</h2>
+
+    {% if accepted_posts %}
+      <div class="posts-grid">
+        {% for p in accepted_posts %}
+        <div class="post-card">
+          <div class="post-header">
+            <span class="post-author">{{ p.user.username }}</span>
+            <span class="post-status accepted">Accepted</span>
+          </div>
+          <div class="post-content">
+            <p class="post-description">{{ p.description }}</p>
+            <p class="post-price">${{ p.price }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="no-services">No accepted posts yet.</p>
+    {% endif %}
+  </div>
+
+</div>
 
 {% endblock %}

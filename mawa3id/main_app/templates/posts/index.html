@@ -20,15 +20,15 @@
             <span class="post-status available">Available</span>
           {% endif %}
         </div>
-        
+
         <div class="post-content">
           <p class="post-description">{{ post.description }}</p>
           <p class="post-price">${{ post.price }}</p>
           {% if post.business %}
-            <p class="post-business">Accepted by: {{ post.business.name }}</p>
+            <p class="post-business">Accepted by: <strong>{{ post.business.name }}</strong></p>
           {% endif %}
         </div>
-        
+
         <div class="post-actions">
           <a href="{% url 'posts_detail' post.id %}" class="btn-link">View Details</a>
           {% if user.profile.role == 'business_owner' and not post.business %}

@@ -1,33 +1,20 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block content %}
 
-<h1>{% if object %}Edit Booking{% else %}Create Booking{% endif %}</h1>
+<div class="form-page-container">
+  <div class="form-page-card">
+    <h1 class="form-page-title">Book Appointment</h1>
 
-{% if form.non_field_errors %}
-  <ul>
-    {% for err in form.non_field_errors %}
-      <li>{{ err }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
+    <form action="" method="post" class="auth-form">
+      {% csrf_token %}
+      {{ form.as_p }}
 
-{% if slot %}
-  <p>
-    <strong>Slot:</strong> {{ slot.start }}
-    {% if slot.service %} — {{ slot.service.name }}{% endif %}
-  </p>
-{% endif %}
-
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Save</button>
-</form>
-
-{% if business_id %}
-  <p>
-    <a href="{% url 'timeslot_list' pk=business_id %}">Back to slots</a>
-  </p>
-{% endif %}
+      <div class="form-actions">
+        <button type="submit" class="btn primary-btn">Confirm Booking</button>
+        <a href="{% url 'home' %}" class="btn cancel-btn">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
 
 {% endblock %}
