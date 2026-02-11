@@ -33,7 +33,18 @@ def home(request):
     if request.user.is_authenticated and request.user.profile.role == Profile.Role.BUSINESS_OWNER:
         businesses = Business.objects.none()
 
-    return render(request, "home.html", {"businesses": businesses})
+    selected_category = request.GET.get("category")
+
+    if selected_category:
+        businesses = businesses.filter(category=selected_category)
+
+    context = {
+        "businesses": businesses,
+        "categories": Business.Category.choices,
+        "selected_category": selected_category,
+    }
+
+    return render(request, "home.html", context)
 
 def signup(request):
     error_message = ""
