@@ -36,11 +36,14 @@ def home(request):
             return redirect("business_dashboard")
         else:
             selected_category = request.GET.get("category")
-            businesses = businesses.filter(category=selected_category)
+
+            if selected_category:
+                businesses = businesses.filter(category=selected_category)
 
             context = {
                 "businesses": businesses,
                 "categories": Business.Category.choices,
+                "selected_category": selected_category,
             }
     else:
         return render(request, "home.html", context)

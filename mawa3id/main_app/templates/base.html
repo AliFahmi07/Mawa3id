@@ -23,6 +23,7 @@
 
     {% if user_role == "client" %}
     <li><a href="{% url 'posts_create' %}">Create Post</a></li>
+    <li><a href="{% url 'home' %}">Home</a></li>
     {% else %}
       <li><a href="{% url 'posts_index' %}">Posts</a></li>
       {% with mybiz=user.businesses.first %}
