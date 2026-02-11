@@ -171,17 +171,17 @@ git commit
 ## 👨‍💻 Team members
 
 **Ali Shamlooh**
-Software Engineer | Django Developer
-> Add your LinkedIn / GitHub profile link here
-**Ali Shamlooh**
-Software Engineer | Django Developer
-> Add your LinkedIn / GitHub profile link here
-**Ali Shamlooh**
-Software Engineer | Django Developer
-> Add your LinkedIn / GitHub profile link here
-**Ali Shamlooh**
-Software Engineer | Django Developer
-> Add your LinkedIn / GitHub profile link here
+Software Engineer | Full Stack Developer
+[GitHub Profile](https://github.com/Ali19Shamlooh)
+**Ali Fahmi**
+Software Engineer | Full Stack Developer
+[GitHub Profile](https://github.com/AliFahmi07)
+**Ammar Shabib**
+Software Engineer | Full Stack Developer
+[GitHub Profile](https://github.com/ammarys-w)
+**Abdulla Khamis**
+Software Engineer | Full Stack Developer
+[GitHub Profile](https://github.com/3bdulla03)
 
 ---
 
